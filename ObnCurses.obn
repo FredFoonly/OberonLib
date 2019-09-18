@@ -1,0 +1,118 @@
+MODULE ObnCurses;
+
+   VAR
+	  ANormal* : INTEGER;
+	  AStandout* : INTEGER;
+	  AUnderline* : INTEGER;
+	  AReverse* : INTEGER;
+	  ABlink* : INTEGER;
+	  ADim* : INTEGER;
+	  ABold* : INTEGER;
+	  AAltCharSet* : INTEGER;
+	  AInvis* : INTEGER;
+	  AProtect* : INTEGER;
+	  AHorizontal* : INTEGER;
+	  ALeft* : INTEGER;
+	  ALow* : INTEGER;
+	  ARight* : INTEGER;
+	  ATop* : INTEGER;
+	  AVertical* : INTEGER;
+
+	  Black* : INTEGER;
+	  Red* : INTEGER;
+	  Green* : INTEGER;
+	  Yellow* : INTEGER;
+	  Blue* : INTEGER;
+	  Magenta*: INTEGER;
+	  Cyan* : INTEGER;
+	  White* : INTEGER;
+	  
+
+   PROCEDURE InitScr*;
+   END InitScr;
+   
+
+   PROCEDURE Raw*;
+   END Raw;
+   
+
+   PROCEDURE NoEcho*;
+   END NoEcho;
+
+
+   PROCEDURE Keypad*(on :  BOOLEAN);
+   END Keypad;
+
+
+   PROCEDURE HasColors*() : BOOLEAN;
+	  RETURN FALSE
+   END HasColors;
+
+
+   PROCEDURE StartColor*;
+   END StartColor;
+   
+
+   PROCEDURE InitColorPair*(id, fg, bg: BYTE);
+   END InitColorPair;
+
+
+   PROCEDURE AddStr*(s : ARRAY OF CHAR);
+   END AddStr;
+
+
+   PROCEDURE MvAddStr*(row, col: INTEGER; s : ARRAY OF CHAR);
+   END MvAddStr;
+
+
+   PROCEDURE AddCh*(c : CHAR);
+   END AddCh;
+
+
+   PROCEDURE MvAddCh*(row, col : INTEGER; c : CHAR);
+   END MvAddCh;
+
+
+   PROCEDURE AddLn*;
+   END AddLn;
+
+
+   PROCEDURE AddTab*;
+   END AddTab;
+
+
+   PROCEDURE Refresh*;
+   END Refresh;
+
+
+   PROCEDURE GetCh*() : CHAR ;
+	  RETURN " "
+   END GetCh;
+
+
+   PROCEDURE KeyF*(n: INTEGER) : CHAR;
+	  RETURN " "
+   END KeyF;
+
+
+   PROCEDURE AttrSet*(f: INTEGER);
+   END AttrSet;
+
+
+   PROCEDURE AttrGet*() : INTEGER;
+	  RETURN 0
+   END AttrGet;
+
+
+   PROCEDURE AttrOn*(f: INTEGER);
+   END AttrOn;
+
+
+   PROCEDURE AttrOff*(f: INTEGER);
+   END AttrOff;
+
+
+   PROCEDURE EndWin*;
+   END EndWin;
+
+END ObnCurses.
