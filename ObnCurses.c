@@ -73,40 +73,6 @@ void ObnCurses__InitColorPair_(unsigned char id_, unsigned char fg_, unsigned ch
   init_pair(id_, fg_, bg_);
 }
 
-void ObnCurses__AddStr_(const char s_[], OBNC_LONGI int s_len)
-{
-  addnstr(s_, s_len);
-}
-
-
-void ObnCurses__MvAddStr_(OBNC_LONGI int row_, OBNC_LONGI int col_, const char s_[], OBNC_LONGI int s_len)
-{
-  mvaddnstr(row_, col_, s_, s_len);
-}
-
-
-void ObnCurses__AddCh_(const char c_)
-{
-  addch(c_);
-}
-
-void ObnCurses__MvAddCh_(OBNC_LONGI int row_, OBNC_LONGI int col_, const char c_)
-{
-  mvaddch(row_, col_, c_);
-}
-
-
-void ObnCurses__AddLn_()
-{
-  addch('\n');
-}
-
-
-void ObnCurses__AddTab_()
-{
-  addch('\n');
-}
-
 
 
 void ObnCurses__Refresh_(void)

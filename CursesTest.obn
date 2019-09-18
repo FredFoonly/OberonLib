@@ -21,14 +21,14 @@ BEGIN
    ELSE
 	  CS.AddStr("The pressed key is ");
 	  C.AttrOn(C.ABold);
-	  C.AddCh(chr);
-	  C.AddCh(chr);
-	  C.AddCh(chr);
-	  C.AddCh(chr);
-	  C.AddCh(chr);
+	  CS.AddCh(chr);
+	  CS.AddCh(chr);
+	  CS.AddCh(chr);
+	  CS.AddCh(chr);
+	  CS.AddCh(chr);
 	  C.AttrOff(C.ABold);
    END;
-   C.AddCh(0AX);
+   CS.AddCh(0AX);
    C.Refresh();
    chr := C.GetCh();
    C.EndWin;
