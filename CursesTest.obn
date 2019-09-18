@@ -1,7 +1,8 @@
 MODULE CursesTest;
 
    IMPORT
-	  C := ObnCurses;
+	  C := ObnCurses,
+	  CS := ObnCursesScr;
 
    VAR
 	  chr : CHAR;
@@ -11,15 +12,19 @@ BEGIN
    C.Raw;
    C.Keypad(TRUE);
    C.NoEcho;
-   C.AddStr("Type any character to see it in bold");
-   C.AddCh(0AX);
+   CS.AddStr("Type any character to see it in bold");
+   CS.AddCh(0AX);
    C.Refresh;
    chr := C.GetCh();
    IF chr = C.KeyF(1) THEN
-	  C.AddStr("F1 Key Pressed");
+	  CS.AddStr("F1 Key Pressed");
    ELSE
-	  C.AddStr("The pressed key is ");
+	  CS.AddStr("The pressed key is ");
 	  C.AttrOn(C.ABold);
+	  C.AddCh(chr);
+	  C.AddCh(chr);
+	  C.AddCh(chr);
+	  C.AddCh(chr);
 	  C.AddCh(chr);
 	  C.AttrOff(C.ABold);
    END;

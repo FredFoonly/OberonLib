@@ -1,0 +1,28 @@
+MODULE ObnCursesScr;
+
+
+   PROCEDURE AddStr*(s : ARRAY OF CHAR);
+   END AddStr;
+
+
+   PROCEDURE MvAddStr*(row, col: INTEGER; s : ARRAY OF CHAR);
+   END MvAddStr;
+
+
+   PROCEDURE AddCh*(c : CHAR);
+   END AddCh;
+
+
+   PROCEDURE MvAddCh*(row, col : INTEGER; c : CHAR);
+   END MvAddCh;
+
+
+   PROCEDURE AddLn*;
+   END AddLn;
+
+
+   PROCEDURE AddTab*;
+   END AddTab;
+
+
+END ObnCursesScr.
