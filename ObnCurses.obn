@@ -1,32 +1,126 @@
 MODULE ObnCurses;
 
-   VAR
-	  ANormal* : INTEGER;
-	  AStandout* : INTEGER;
-	  AUnderline* : INTEGER;
-	  AReverse* : INTEGER;
-	  ABlink* : INTEGER;
-	  ADim* : INTEGER;
-	  ABold* : INTEGER;
-	  AAltCharSet* : INTEGER;
-	  AInvis* : INTEGER;
-	  AProtect* : INTEGER;
-	  AHorizontal* : INTEGER;
-	  ALeft* : INTEGER;
-	  ALow* : INTEGER;
-	  ARight* : INTEGER;
-	  ATop* : INTEGER;
-	  AVertical* : INTEGER;
+   TYPE CCHAR* = INTEGER;
 
-	  Black* : INTEGER;
-	  Red* : INTEGER;
-	  Green* : INTEGER;
-	  Yellow* : INTEGER;
-	  Blue* : INTEGER;
-	  Magenta*: INTEGER;
-	  Cyan* : INTEGER;
-	  White* : INTEGER;
+   VAR
+      ANormal* : INTEGER;
+      AStandout* : INTEGER;
+      AUnderline* : INTEGER;
+      AReverse* : INTEGER;
+      ABlink* : INTEGER;
+      ADim* : INTEGER;
+      ABold* : INTEGER;
+      AAltCharSet* : INTEGER;
+      AInvis* : INTEGER;
+      AProtect* : INTEGER;
+      AHorizontal* : INTEGER;
+      ALeft* : INTEGER;
+      ALow* : INTEGER;
+      ARight* : INTEGER;
+      ATop* : INTEGER;
+      AVertical* : INTEGER;
+      AItalic* : INTEGER;
+
+      Black* : INTEGER;
+      Red* : INTEGER;
+      Green* : INTEGER;
+      Yellow* : INTEGER;
+      Blue* : INTEGER;
+      Magenta*: INTEGER;
+      Cyan* : INTEGER;
+      White* : INTEGER;
 	  
+      KeyDown* : INTEGER;
+      KeyUp* : INTEGER;
+      KeyLeft* : INTEGER;
+      KeyRight* : INTEGER;
+      KeyHome* : INTEGER;
+      KeyBackspace* : INTEGER;
+      KeyF0* : INTEGER;
+      KeyDl* : INTEGER;
+      KeyIl* : INTEGER;
+      KeyDc* : INTEGER;
+      KeyIc* : INTEGER;
+      KeyEic* : INTEGER;
+      KeyClear* : INTEGER;
+      KeyEos* : INTEGER;
+      KeyEol* : INTEGER;
+      KeySf* : INTEGER;
+      KeySr* : INTEGER;
+      KeyNpage* : INTEGER;
+      KeyPpage* : INTEGER;
+      KeyStab* : INTEGER;
+      KeyCtab* : INTEGER;
+      KeyCatab* : INTEGER;
+      KeyEnter* : INTEGER;
+      KeyPrint* : INTEGER;
+      KeyLl* : INTEGER;
+      KeyA1* : INTEGER;
+      KeyA3* : INTEGER;
+      KeyB2* : INTEGER;
+      KeyC1* : INTEGER;
+      KeyC3* : INTEGER;
+      KeyBtab* : INTEGER;
+      KeyBeg* : INTEGER;
+      KeyCancel* : INTEGER;
+      KeyClose* : INTEGER;
+      KeyCommand* : INTEGER;
+      KeyCopy* : INTEGER;
+      KeyCreate* : INTEGER;
+      KeyEnd* : INTEGER;
+      KeyExit* : INTEGER;
+      KeyFind* : INTEGER;
+      KeyHelp* : INTEGER;
+      KeyMark* : INTEGER;
+      KeyMessage* : INTEGER;
+      KeyMove* : INTEGER;
+      KeyNext* : INTEGER;
+      KeyOpen* : INTEGER;
+      KeyOptions* : INTEGER;
+      KeyPrevious* : INTEGER;
+      KeyRedo* : INTEGER;
+      KeyReference* : INTEGER;
+      KeyRefresh* : INTEGER;
+      KeyReplace* : INTEGER;
+      KeyRestart* : INTEGER;
+      KeyResume* : INTEGER;
+      KeySave* : INTEGER;
+      KeySbeg* : INTEGER;
+      KeyScancel* : INTEGER;
+      KeyScommand* : INTEGER;
+      KeyScopy* : INTEGER;
+      KeyScreate* : INTEGER;
+      KeySdc* : INTEGER;
+      KeySdl* : INTEGER;
+      KeySelect* : INTEGER;
+      KeySend* : INTEGER;
+      KeySeol* : INTEGER;
+      KeySexit* : INTEGER;
+      KeySfind* : INTEGER;
+      KeyShelp* : INTEGER;
+      KeyShome* : INTEGER;
+      KeySic* : INTEGER;
+      KeySleft* : INTEGER;
+      KeySmessage* : INTEGER;
+      KeySmove* : INTEGER;
+      KeySnext* : INTEGER;
+      KeySoptions* : INTEGER;
+      KeySprevious* : INTEGER;
+      KeySprint* : INTEGER;
+      KeySredo* : INTEGER;
+      KeySreplace* : INTEGER;
+      KeySright* : INTEGER;
+      KeySrsume* : INTEGER;
+      KeySsave* : INTEGER;
+      KeySsuspend* : INTEGER;
+      KeySundo* : INTEGER;
+      KeySuspend* : INTEGER;
+      KeyUndo* : INTEGER;
+      KeyMouse* : INTEGER;
+      KeyResize* : INTEGER;
+      KeyEvent* : INTEGER;
+
+
 
    PROCEDURE InitScr*;
    END InitScr;
@@ -45,7 +139,7 @@ MODULE ObnCurses;
 
 
    PROCEDURE HasColors*() : BOOLEAN;
-	  RETURN FALSE
+      RETURN FALSE
    END HasColors;
 
 
@@ -53,21 +147,51 @@ MODULE ObnCurses;
    END StartColor;
    
 
-   PROCEDURE InitColorPair*(id, fg, bg: BYTE);
+   PROCEDURE InitColorPair*(id : INTEGER; fg, bg: BYTE);
    END InitColorPair;
+
+
+   PROCEDURE ColorPair*(i : INTEGER) : INTEGER;
+      RETURN 0
+   END ColorPair;
 
 
    PROCEDURE Refresh*;
    END Refresh;
 
 
-   PROCEDURE GetCh*() : CHAR ;
-	  RETURN " "
-   END GetCh;
+   PROCEDURE Ch*(c : CHAR) : CCHAR;
+      RETURN 0
+   END Ch;
 
 
-   PROCEDURE KeyF*(n: INTEGER) : CHAR;
-	  RETURN " "
+   PROCEDURE ChAttr*(c : CHAR; attr : INTEGER; color : INTEGER) : CCHAR;
+      RETURN 0
+   END ChAttr;
+
+
+   PROCEDURE Char*(c : CCHAR) : CHAR;
+      RETURN " "
+   END Char;
+
+
+   PROCEDURE Attr*(c : CCHAR) : INTEGER;
+      RETURN 0
+   END Attr;
+
+
+   PROCEDURE Color*(c : CCHAR) : INTEGER;
+      RETURN 0
+   END Color;
+
+
+   PROCEDURE GetKey*() : INTEGER;
+	  RETURN 0
+   END GetKey;
+
+
+   PROCEDURE KeyF*(n: INTEGER) : INTEGER;
+	  RETURN 0
    END KeyF;
 
 

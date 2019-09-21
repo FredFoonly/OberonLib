@@ -1,0 +1,86 @@
+MODULE ObnCursesWin;
+
+   IMPORT C := ObnCurses;
+      
+   TYPE Window* = POINTER TO Handle;
+      Handle = RECORD END;
+
+
+   PROCEDURE OpenWin*(lines, cols, y, x : INTEGER) : Window;
+   BEGIN
+      RETURN NIL
+   END OpenWin;
+
+   PROCEDURE CloseWin*(W : Window);
+   END CloseWin;
+
+   PROCEDURE MoveWin*(W : Window; row, col : INTEGER);
+   END MoveWin;
+  
+   PROCEDURE AddStr*(W : Window; s : ARRAY OF CHAR);
+   END AddStr;
+
+   PROCEDURE MvAddStr*(W : Window; row, col: INTEGER; s : ARRAY OF CHAR);
+   END MvAddStr;
+
+   PROCEDURE AddCh*(W : Window; c : C.CCHAR);
+   END AddCh;
+
+   PROCEDURE MvAddCh*(W : Window; row, col : INTEGER; c : C.CCHAR);
+   END MvAddCh;
+
+   PROCEDURE AddLn*(W : Window);
+   END AddLn;
+
+   PROCEDURE AddTab*(W : Window);
+   END AddTab;
+
+   PROCEDURE ClrToEol*(W : Window);
+   END ClrToEol;
+
+   PROCEDURE GetYX*(W : Window; VAR row, col : INTEGER);
+   END GetYX;
+
+   PROCEDURE GetBegYX*(W : Window; VAR row, col : INTEGER);
+   END GetBegYX;
+
+   PROCEDURE GetMaxYX*(W : Window; VAR row, col : INTEGER);
+   END GetMaxYX;
+
+   PROCEDURE Move*(W : Window; row, col : INTEGER);
+   END Move;
+
+   PROCEDURE Refresh*(W : Window);
+   END Refresh;
+
+   PROCEDURE Redraw*(W : Window);
+   END Redraw;
+
+   PROCEDURE RedrawLn*(W : Window; firstLine, numLines : INTEGER);
+   END RedrawLn;
+
+   PROCEDURE MvHLine*(W : Window; row, col : INTEGER; c : C.CCHAR; n : INTEGER);
+   END MvHLine;
+
+   PROCEDURE HLine*(W : Window; c : C.CCHAR; n : INTEGER);
+   END HLine; 
+
+   PROCEDURE MvVLine*(W : Window; row, col : INTEGER; c : C.CCHAR; n : INTEGER);
+   END MvVLine;
+
+   PROCEDURE VLine*(W : Window; c : C.CCHAR; n : INTEGER);
+   END VLine;
+
+   PROCEDURE SetBorder*(W : Window; l, r, t, b, tl, tr, bl, br : C.CCHAR);
+   END SetBorder;
+
+   PROCEDURE ChgAt*(W : Window; n, attr : INTEGER; color: BYTE);
+   END ChgAt;
+
+   PROCEDURE MvChgAt*(W : Window; row, col, n, attr : INTEGER; color: BYTE);
+   END MvChgAt;
+
+   PROCEDURE Clear*(W : Window);
+   END Clear;
+
+END ObnCursesWin.

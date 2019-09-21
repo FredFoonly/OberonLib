@@ -1,28 +1,77 @@
 MODULE ObnCursesScr;
 
+   IMPORT C := ObnCurses;
 
    PROCEDURE AddStr*(s : ARRAY OF CHAR);
    END AddStr;
 
-
    PROCEDURE MvAddStr*(row, col: INTEGER; s : ARRAY OF CHAR);
    END MvAddStr;
 
-
-   PROCEDURE AddCh*(c : CHAR);
+   PROCEDURE AddCh*(c : C.CCHAR);
    END AddCh;
 
-
-   PROCEDURE MvAddCh*(row, col : INTEGER; c : CHAR);
+   PROCEDURE MvAddCh*(row, col : INTEGER; c : C.CCHAR);
    END MvAddCh;
 
+   PROCEDURE Sp*;
+   END Sp;
 
-   PROCEDURE AddLn*;
-   END AddLn;
+   PROCEDURE Ln*;
+   END Ln;
 
+   PROCEDURE Tab*;
+   END Tab;
 
-   PROCEDURE AddTab*;
-   END AddTab;
+   PROCEDURE ClrToEol*;
+   END ClrToEol;
 
+   PROCEDURE GetYX*(VAR row, col : INTEGER);
+   END GetYX;
+
+   PROCEDURE GetBegYX*(VAR row, col : INTEGER);
+   END GetBegYX;
+
+   PROCEDURE GetMaxYX*(VAR row, col : INTEGER);
+   END GetMaxYX;
+
+   PROCEDURE Move*(row, col : INTEGER);
+   END Move;
+
+   PROCEDURE Refresh*();
+   END Refresh;
+
+   PROCEDURE Redraw*();
+   END Redraw;
+
+   PROCEDURE RedrawLn*(firstLine, numLines : INTEGER);
+   END RedrawLn;
+
+   PROCEDURE MvHLine*(row, col : INTEGER; c : C.CCHAR; n : INTEGER);
+   END MvHLine;
+
+   PROCEDURE HLine*(c : C.CCHAR; n : INTEGER);
+   END HLine;
+
+   PROCEDURE MvVLine*(row, col : INTEGER; c : C.CCHAR; n : INTEGER);
+   END MvVLine;
+
+   PROCEDURE VLine*(c : C.CCHAR; n : INTEGER);
+   END VLine;
+
+   PROCEDURE Box*(v, h : C.CCHAR);
+   END Box;
+
+   PROCEDURE Border*(l, r, t, b, tl, tr, bl, br : C.CCHAR);
+   END Border;
+
+   PROCEDURE ChgAt*(n, attr : INTEGER; color: BYTE);
+   END ChgAt;
+
+   PROCEDURE MvChgAt*(row, col, n, attr : INTEGER; color: BYTE);
+   END MvChgAt;
+
+   PROCEDURE Clear*();
+   END Clear;
 
 END ObnCursesScr.

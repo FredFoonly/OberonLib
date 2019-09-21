@@ -1,35 +1,60 @@
 MODULE CursesTest;
 
    IMPORT
-	  C := ObnCurses,
-	  CS := ObnCursesScr;
+      C := ObnCurses,
+      CS := ObnCursesScr,
+      CW := ObnCursesWin;
 
    VAR
-	  chr : CHAR;
-
+      key : INTEGER;
+      w : CW.Window;
 BEGIN
    C.InitScr;
    C.Raw;
    C.Keypad(TRUE);
    C.NoEcho;
    CS.AddStr("Type any character to see it in bold");
-   CS.AddCh(0AX);
+   CS.AddCh(C.Ch(0AX));
    C.Refresh;
-   chr := C.GetCh();
-   IF chr = C.KeyF(1) THEN
-	  CS.AddStr("F1 Key Pressed");
+   key := C.GetKey();
+   IF key = C.KeyF(1) THEN
+      CS.AddStr("F1 Key Pressed");
    ELSE
-	  CS.AddStr("The pressed key is ");
-	  C.AttrOn(C.ABold);
-	  CS.AddCh(chr);
-	  CS.AddCh(chr);
-	  CS.AddCh(chr);
-	  CS.AddCh(chr);
-	  CS.AddCh(chr);
-	  C.AttrOff(C.ABold);
+      CS.AddStr("The pressed key is ");
+      C.AttrOn(C.ABold);
+      CS.AddCh(key);
+      CS.AddCh(key);
+      CS.AddCh(key);
+      CS.AddCh(key);
+      CS.AddCh(key);
+      C.AttrOff(C.ABold);
    END;
-   CS.AddCh(0AX);
+   CS.AddCh(C.Ch(0AX));
    C.Refresh();
-   chr := C.GetCh();
+   key := C.GetKey();
+
+   w := CW.OpenWin(10, 40, 10, 10);
+   CW.SetBorder(w, C.Ch("|"), C.Ch("|"), C.Ch("-"), C.Ch("-"), C.Ch("+"), C.Ch("+"), C.Ch("+"), C.Ch("+"));
+   CW.Move(w, 1, 1);
+   CW.Refresh(w);
+   IF key = C.KeyF(1) THEN
+      CW.AddStr(w, "F1 Key Pressed");
+      CW.Refresh(w);
+   ELSE
+      CW.AddStr(w, "The pressed key is ");
+      C.AttrOn(C.ABold);
+      CW.AddCh(w, key);
+      CW.AddCh(w, key);
+      CW.AddCh(w, key);
+      CW.AddCh(w, key);
+      CW.AddCh(w, key);
+      C.AttrOff(C.ABold);
+      CW.Refresh(w);
+   END;
+   CW.Refresh(w);
+   key := C.GetKey();
+   CW.CloseWin(w);
+
+   key := C.GetKey();
    C.EndWin;
 END CursesTest.
