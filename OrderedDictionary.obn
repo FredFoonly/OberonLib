@@ -1,0 +1,232 @@
+
+MODULE OrderedDictionary;
+   IMPORT I := Interfaces, R := Random;
+
+   TYPE
+      KeyComparerTC* = POINTER TO KeyComparerTCDesc;
+      KeyComparerTCDesc* = RECORD (I.TypeClassDesc)
+	 Less* : PROCEDURE(kc : KeyComparerTC; a, b : I.Obj) : BOOLEAN;
+	 Eql* : PROCEDURE(kc : KeyComparerTC; a, b : I.Obj) : BOOLEAN;
+	 NEql* : PROCEDURE(kc : KeyComparerTC; a, b : I.Obj) : BOOLEAN
+      END;
+
+      Node = POINTER TO NodeDesc;
+      NodeDesc = RECORD
+	 key: I.Obj;
+	 priority, count : INTEGER;
+	 left, right : Node
+      END;
+
+      Dict* = POINTER TO DictDesc;
+      DictDesc* = RECORD
+	 Root : Node;
+	 Rnd : R.Random;
+	 KeyClass : KeyComparerTC
+      END;
+      Visitor* = PROCEDURE(k : I.Obj; state: I.Obj) : BOOLEAN;
+      
+
+      
+   PROCEDURE default_neql(kc : KeyComparerTC; k1, k2 : I.Obj) : BOOLEAN;
+   BEGIN
+      RETURN kc.Less(kc, k1, k2) OR kc.Less(kc, k2, k1)
+   END default_neql;
+
+   PROCEDURE default_eql(kc : KeyComparerTC; k1, k2 : I.Obj) : BOOLEAN;
+   BEGIN
+      RETURN ~default_neql(kc, k1, k2)
+   END default_eql;
+
+   PROCEDURE defaultComparisonMethods(kc : KeyComparerTC);
+   BEGIN
+      IF kc.NEql = NIL THEN
+	 kc.NEql := default_neql;
+      END;
+      IF kc.Eql = NIL THEN
+	 kc.Eql := default_eql;
+      END;
+   END defaultComparisonMethods;
+
+
+
+
+   PROCEDURE count(t : Node) : INTEGER;
+      VAR n : INTEGER;
+   BEGIN
+      IF t = NIL THEN
+	 n := 0;
+      ELSE
+	 n := t.count;
+      END;
+      RETURN n
+   END count;
+
+   PROCEDURE updateCount(VAR t : Node);
+   BEGIN
+      IF t # NIL THEN
+	 t.count := 1 + count(t.left) + count(t.right);
+      END;
+   END updateCount;
+
+   PROCEDURE split(kc : KeyComparerTC; t : Node; key : I.Obj; VAR l, r : Node);
+   BEGIN
+      IF t = NIL THEN
+	 l := NIL;
+	 r := NIL;
+      ELSIF kc.Less(kc, key, t.key) THEN
+	 split(kc, t.left, key, l, t.left);
+	 r := t;
+      ELSE
+	 split(kc, t.right, key, t.right, r);
+	 l := t;
+      END;
+      updateCount(t);
+   END split;
+
+   PROCEDURE insertNode(kc : KeyComparerTC; VAR t : Node; VAR it : Node);
+   BEGIN
+      IF t = NIL THEN
+	 t := it;
+      ELSIF it.priority > t.priority THEN
+	 split(kc, t, it.key, it.left, it.right);
+	 t := it;
+      ELSIF kc.Less(kc, it.key, t.key) THEN
+	 insertNode(kc, t.left, it);
+      ELSE
+	 insertNode(kc, t.right, it);
+      END;
+      updateCount(t);
+   END insertNode;
+
+   PROCEDURE merge(kc : KeyComparerTC; VAR t : Node; l, r : Node);
+   BEGIN
+      IF (l = NIL) OR (r = NIL) THEN
+	 IF l # NIL THEN
+	    t := l;
+	 ELSE
+	    t := r;
+	 END;
+      ELSIF l.priority > r.priority THEN
+	 merge(kc, l.right, l.right, r);
+	 t := l;
+      ELSE
+	 merge(kc, r.left, l, r.left);
+	 t := r;
+      END;
+      updateCount(t);
+   END merge;
+
+   PROCEDURE erase(kc : KeyComparerTC; VAR t : Node; key : I.Obj);
+   BEGIN
+      IF kc.Eql(kc, t.key, key) THEN
+	 merge(kc, t, t.left, t.right);
+      ELSIF kc.Less(kc, key, t.key) THEN
+	 erase(kc, t.left, key);
+      ELSE
+	 erase(kc, t.right, key);
+      END;
+      updateCount(t);
+   END erase;
+
+   PROCEDURE locateNode(kc : KeyComparerTC; t : Node; key : I.Obj) : Node;
+   BEGIN
+      WHILE (t # NIL) & kc.NEql(kc, key, t.key) DO
+	 IF kc.Less(kc, key, t.key) THEN
+	    t := t.left;
+	 ELSE
+	    t := t.right;
+	 END;
+      END;
+      RETURN t
+   END locateNode;
+
+   PROCEDURE recursiveVisit(t : Node; visit : Visitor; VAR state : I.Obj) : BOOLEAN;
+      VAR continue : BOOLEAN;
+   BEGIN
+      continue := TRUE;
+      IF t # NIL THEN
+	 continue := recursiveVisit(t.left, visit, state);
+	 IF continue THEN
+	    continue := visit(t.key, state);
+	 END;
+	 IF continue THEN
+	    continue := recursiveVisit(t.right, visit, state);
+	 END;
+      END;
+      RETURN continue
+   END recursiveVisit;
+
+
+
+
+   PROCEDURE Init*(VAR dict : DictDesc; kc : KeyComparerTCDesc);
+   BEGIN
+      dict.Root := NIL;
+      R.Init(dict.Rnd, 12345);
+      NEW(dict.KeyClass);
+      dict.KeyClass^ := kc;
+      defaultComparisonMethods(dict.KeyClass);
+   END Init;
+
+   PROCEDURE New*(kc : KeyComparerTCDesc) : Dict;
+      VAR dict : Dict;
+   BEGIN
+      NEW(dict);
+      Init(dict^, kc);
+      RETURN dict
+   END New;
+
+   PROCEDURE Insert*(VAR dict : DictDesc; k : I.Obj);
+      VAR
+	 it : Node;
+   BEGIN
+      NEW(it);
+      it.key := k; it.priority := R.Next(dict.Rnd); it.count := 1;
+      it.left := NIL; it.right := NIL;
+      insertNode(dict.KeyClass, dict.Root, it);
+   END Insert;
+
+   PROCEDURE DeleteKey*(VAR dict : DictDesc; k : I.Obj);
+   BEGIN
+      erase(dict.KeyClass, dict.Root, k);
+   END DeleteKey;
+
+   PROCEDURE ContainsKey*(VAR dict : DictDesc; k : I.Obj) : BOOLEAN;
+      VAR exists : BOOLEAN;
+	 node : Node;
+   BEGIN
+      exists := FALSE;
+      node := locateNode(dict.KeyClass, dict.Root, k);
+      IF node # NIL THEN
+	 exists := TRUE;
+      END;
+      RETURN exists
+   END ContainsKey;
+
+   PROCEDURE Get*(VAR dict : DictDesc; k : I.Obj) : I.Obj;
+      VAR
+	 retn : I.Obj;
+	 node : Node;
+   BEGIN
+      retn := NIL;
+      node := locateNode(dict.KeyClass, dict.Root, k);
+      IF node # NIL THEN
+	 retn := node.key;
+      END;
+      RETURN retn
+   END Get;
+
+   PROCEDURE Count*(VAR dict : DictDesc) : INTEGER;
+   BEGIN
+      RETURN count(dict.Root)
+   END Count;
+
+   PROCEDURE Visit*(VAR dict : DictDesc; visit : Visitor; state: I.Obj);
+      VAR
+	 continue : BOOLEAN;
+   BEGIN
+      continue := recursiveVisit(dict.Root, visit, state);
+   END Visit;
+   
+
+END OrderedDictionary.

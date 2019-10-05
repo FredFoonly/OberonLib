@@ -1,0 +1,86 @@
+MODULE OrderedDictionaryTest;
+
+   IMPORT Out,
+	 T := OrderedDictionary,
+	 I := Interfaces;
+
+   CONST
+      maxn = 100;
+
+   TYPE
+      KV = POINTER TO KVDesc;
+      KVDesc = RECORD (I.ObjDesc)
+	 k : INTEGER;
+	 v : INTEGER
+      END;
+
+   VAR
+      d : T.DictDesc;
+      compareNodes : T.KeyComparerTCDesc;
+      i, j : INTEGER;
+      k : KV;
+
+
+   PROCEDURE Less(kc : T.KeyComparerTC; a, b : I.Obj) : BOOLEAN;
+   BEGIN
+      RETURN a(KV).k < b(KV).k
+   END Less;
+
+
+   PROCEDURE keyprinter(oa : I.Obj; state : I.Obj) : BOOLEAN;
+      VAR a : KV;
+   BEGIN
+      a := oa(KV);
+      IF (a.k >= 10) & (a.k <= 20) THEN 
+	 Out.Int(a.k, 0); Out.String(" ");
+      END;
+      RETURN a.k < 20
+   END keyprinter;
+
+BEGIN
+   compareNodes.Less := Less;
+   T.Init(d, compareNodes);
+
+   Out.String("Inserting keys"); Out.Ln;
+   FOR i := 1 TO maxn DO
+      NEW(k); k.k := i; k.v := -i;
+      T.Insert(d, k);
+   END;
+
+   Out.String("Checking keys, ct = "); Out.Int(T.Count(d), 0); Out.Ln;
+   NEW(k);
+   FOR i := 1 TO maxn DO
+      k.k := i;
+      IF ~T.ContainsKey(d, k) THEN
+	 Out.String("Missing key "); Out.Int(i, 0); Out.Ln;
+      END;
+   END;
+
+   Out.String("Removing odd keys"); Out.Ln;
+   FOR i := 1 TO maxn BY 2 DO
+      k.k := i;
+      T.DeleteKey(d, k);
+   END;
+
+   Out.String("Verifying keys were deleted, ct = "); Out.Int(T.Count(d), 0); Out.Ln;
+   FOR i := 1 TO maxn BY 2 DO
+      k.k := i;
+      IF T.ContainsKey(d, k) THEN
+	 Out.String("Key should have been deleted"); Out.Int(i, 0); Out.Ln;
+      END;
+   END;
+
+   Out.String("Verifying other keys remain"); Out.Ln;
+   FOR i := 2 TO maxn BY 2 DO
+      k.k := i;
+      IF ~T.ContainsKey(d, k) THEN
+	 Out.String("Key should not have been deleted"); Out.Int(i, 0); Out.Ln;
+      END;
+   END;
+
+
+   Out.String("Printing keys from 10 to 20"); Out.Ln;
+   T.Visit(d, keyprinter, NIL);
+
+   Out.String("Done"); Out.Ln;
+END OrderedDictionaryTest.

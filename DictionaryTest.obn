@@ -1,0 +1,163 @@
+MODULE DictionaryTest;
+
+   IMPORT Out,
+      T := Dictionary,
+      I := Interfaces,
+      R := Random;
+      
+
+   CONST
+      (*maxn = 10000000;*)
+      maxn = 1000;
+      keyn = 32;
+
+   TYPE
+      keystr = ARRAY keyn OF CHAR;
+      KV = POINTER TO KVDesc;
+      KVDesc = RECORD (I.ObjDesc)
+	 k : keystr;
+	 v : INTEGER
+      END;
+
+      keyprinterstate = POINTER TO RECORD (I.ObjDesc)
+	 ct : INTEGER;
+	 first, last : INTEGER
+      END;
+
+
+   VAR
+      d : T.DictDesc;
+      compareNodes : T.KeyComparerTCDesc;
+      i : INTEGER;
+      k : KV;
+      keys : ARRAY maxn OF keystr;
+      printstate : keyprinterstate;
+
+
+   PROCEDURE Eql(kc : T.KeyComparerTC; a, b : I.Obj) : BOOLEAN;
+   BEGIN
+      RETURN a(KV).k = b(KV).k
+   END Eql;
+
+
+   PROCEDURE Hash(kc : T.KeyComparerTC; oa : I.Obj) : INTEGER;
+      VAR i, h : INTEGER;
+	 a : KV;
+   BEGIN
+      a := oa(KV);
+      i := 0;
+      h := 0DEADBEEFH;
+      WHILE (i < LEN(a.k)) & (a.k[i] # 0X) DO
+	 h := h + LSL(ORD(a.k[i]), i MOD 24);
+	 INC(i);
+      END;
+      RETURN ABS(h)
+   END Hash;
+
+
+   PROCEDURE MkRandKey(VAR k : ARRAY OF CHAR);
+      VAR i : INTEGER;
+	 n : INTEGER;
+   BEGIN
+      n := R.NextRandRange(7, LEN(k)-1);
+      (*Out.String("Rand len = "); Out.Int(n, 0); Out.String(" --> ");*)
+      FOR i := 0 TO n-1 DO
+	 k[i] := CHR(R.NextRandRange(ORD("a"), ORD("z")));
+      END;
+      k[n] := 0X;
+      (*Out.String(k); Out.Ln;*)
+   END MkRandKey;
+
+
+   PROCEDURE keyprinter(oa : I.Obj; os : I.Obj) : BOOLEAN;
+      VAR a : KV;
+	 s : keyprinterstate;
+   BEGIN
+      a := oa(KV);
+      s := os(keyprinterstate);
+      IF s.ct >= s.first THEN 
+	 Out.Int(s.ct, 3); Out.String(": '"); Out.String(a.k); Out.String("' "); Out.Ln;
+      END;
+      INC(s.ct);
+      RETURN s.ct < s.last
+   END keyprinter;
+
+
+
+BEGIN
+   compareNodes.Eql := Eql;
+   compareNodes.Hash := Hash;
+   T.InitCap(d, compareNodes, maxn);
+
+   Out.String("Generating random keys"); Out.Ln;
+   FOR i := 0 TO maxn-1 DO
+      MkRandKey(keys[i]);
+   END;
+
+
+   Out.String("Inserting keys"); Out.Ln;
+   FOR i := 0 TO maxn-1 DO
+      NEW(k);
+      k.k := keys[i];
+      k.v := i;
+      (* Out.String("Inserting "); Out.String(k.k); Out.Ln;*)
+      IF (i MOD 1000) = 0 THEN
+	 Out.Int(i, 0); Out.Ln;
+      END;
+      T.Insert(d, k);
+   END;
+
+   Out.String("Checking keys, ct = "); Out.Int(T.Count(d), 0); Out.Ln;
+   NEW(k);
+   FOR i := 0 TO maxn-1 DO
+      k.k := keys[i];
+      IF ~T.ContainsKey(d, k) THEN
+	 Out.String("Missing key: "); Out.String(keys[i]); Out.Ln;
+      END;
+   END;
+
+   Out.String("Removing odd keys"); Out.Ln;
+   FOR i := 0 TO maxn-1 BY 2 DO
+      k.k := keys[i];
+      T.DeleteKey(d, k);
+   END;
+
+   Out.String("Verifying keys were deleted, ct = "); Out.Int(T.Count(d), 0); Out.Ln;
+   FOR i := 0 TO maxn-1 BY 2 DO
+      k.k := keys[i];
+      IF T.ContainsKey(d, k) THEN
+	 Out.String("Key should have been deleted: "); Out.String(keys[i]); Out.Ln;
+      END;
+   END;
+
+   Out.String("Verifying other keys remain"); Out.Ln;
+   FOR i := 1 TO maxn-1 BY 2 DO
+      k.k := keys[i];
+      IF ~T.ContainsKey(d, k) THEN
+	 Out.String("Key should not have been deleted: "); Out.String(keys[i]); Out.Ln;
+      END;
+   END;
+
+   Out.String("Printing keys from 10 to 20"); Out.Ln;
+   NEW(printstate); printstate.ct := 0; printstate.first := 10; printstate.last := 20;
+   T.Visit(d, keyprinter, printstate);
+
+
+   Out.String("Removing all but first 100 keys"); Out.Ln;
+   FOR i := 100 TO maxn-1 DO
+      k.k := keys[i];
+      T.DeleteKey(d, k);
+   END;
+
+
+   Out.String("Verifying other keys remain, ct = "); Out.Int(T.Count(d), 0); Out.Ln;
+   FOR i := 1 TO 99 BY 2 DO
+      k.k := keys[i];
+      IF ~T.ContainsKey(d, k) THEN
+	 Out.String("Key should not have been deleted: "); Out.String(keys[i]); Out.Ln;
+      END;
+   END;
+
+
+   Out.String("Done"); Out.Ln;
+END DictionaryTest.

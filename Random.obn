@@ -1,0 +1,62 @@
+MODULE Random;
+
+   CONST
+      mult = 1664525;
+      incr = 1013904223;
+
+   TYPE
+      Random* = RECORD
+	 seed : INTEGER
+      END;
+
+   VAR
+      Rand : Random;
+
+   PROCEDURE mix(VAR r : Random);
+   BEGIN
+      r.seed := (mult * r.seed) + incr;
+   END mix;
+
+   PROCEDURE Next*(VAR r : Random) : INTEGER;
+   BEGIN
+      mix(r);
+      RETURN ASR(ABS(r.seed), 8)
+   END Next;
+
+   PROCEDURE NextRange*(VAR r : Random; lower, upper : INTEGER) : INTEGER;
+      VAR rnd: INTEGER;
+   BEGIN
+      rnd := Next(r);
+      RETURN lower + (rnd MOD (upper - lower))
+   END NextRange;
+
+   PROCEDURE Reseed*(VAR r: Random; seed : INTEGER);
+   BEGIN
+      r.seed := seed; 
+      mix(r); mix(r); mix(r); mix(r);
+   END Reseed;
+
+   PROCEDURE Init*(VAR r: Random; seed : INTEGER);
+   BEGIN
+      Reseed(r, seed);
+   END Init;
+
+   PROCEDURE NextRand*() : INTEGER;
+   BEGIN
+      RETURN Next(Rand)
+   END NextRand;
+
+   PROCEDURE NextRandRange*(lower, upper : INTEGER) : INTEGER;
+   BEGIN
+      RETURN NextRange(Rand, lower, upper)
+   END NextRandRange;
+
+   PROCEDURE ReseedRand*(seed : INTEGER);
+   BEGIN
+      Reseed(Rand, seed);
+   END ReseedRand;
+
+BEGIN
+   Init(Rand, 0);
+END Random.
+

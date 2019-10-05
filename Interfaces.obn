@@ -1,0 +1,30 @@
+MODULE Interfaces;
+
+   TYPE
+      Obj* = POINTER TO ObjDesc;
+      ObjDesc* = RECORD END;
+      TypeClass* = POINTER TO TypeClassDesc;
+      TypeClassDesc* = RECORD END;
+      Interface* = POINTER TO InterfaceDesc;
+      InterfaceDesc* = RECORD
+	 Obj* : Obj;
+	 Cls* : TypeClass
+      END;
+
+   PROCEDURE Init*(VAR intf : InterfaceDesc; o : Obj; c : TypeClass);
+   BEGIN
+      intf.Obj := o;
+      intf.Cls := c;
+   END Init;
+   
+   PROCEDURE New*(o : Obj; c : TypeClass) : Interface;
+      VAR intf : Interface;
+   BEGIN
+      NEW(intf);
+      Init(intf^, o, c);
+      RETURN intf
+   END New;
+
+   
+END Interfaces.
+

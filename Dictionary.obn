@@ -1,0 +1,578 @@
+
+MODULE Dictionary;
+   IMPORT I := Interfaces;
+
+   CONST
+      t1cap =  000000100H;
+      t2cap =  000000400H;
+      t3cap =  000001000H;
+      t4cap =  000004000H;
+      t5cap =  000010000H;
+      t6cap =  000040000H;
+      t7cap =  000100000H;
+      t8cap =  000400000H;
+      t9cap =  001000000H;
+      t10cap = 004000000H;
+      t11cap = 010000000H;
+      t12cap = 040000000H;
+
+   TYPE
+      KeyComparerTC* = POINTER TO KeyComparerTCDesc;
+      KeyComparerTCDesc* = RECORD (I.TypeClassDesc)
+	 Eql* : PROCEDURE(kc : KeyComparerTC; a, b : I.Obj) : BOOLEAN;
+	 Hash* : PROCEDURE(kc : KeyComparerTC; a : I.Obj) : INTEGER
+      END;
+
+      Table = POINTER TO TableDesc;
+      TableDesc = RECORD
+	 count : INTEGER;
+	 cap : INTEGER;
+	 get : PROCEDURE(t : Table; i : INTEGER) : I.Obj;
+	 set : PROCEDURE(t : Table; i : INTEGER; v : I.Obj)
+      END;
+      Table1 = POINTER TO Table1Desc;
+      Table1Desc = RECORD (Table)
+	 data : ARRAY t1cap OF I.Obj
+      END;
+      Table2 = POINTER TO Table2Desc;
+      Table2Desc = RECORD (Table)
+	 data : ARRAY t2cap OF I.Obj
+      END;
+      Table3 = POINTER TO Table3Desc;
+      Table3Desc = RECORD (Table)
+	 data : ARRAY t3cap OF I.Obj
+      END;
+      Table4 = POINTER TO Table4Desc;
+      Table4Desc = RECORD (Table)
+	 data : ARRAY t4cap OF I.Obj
+      END;
+      Table5 = POINTER TO Table5Desc;
+      Table5Desc = RECORD (Table)
+	 data : ARRAY t5cap OF I.Obj
+      END;
+      Table6 = POINTER TO Table6Desc;
+      Table6Desc = RECORD (Table)
+	 data : ARRAY t6cap OF I.Obj
+      END;
+      Table7 = POINTER TO Table7Desc;
+      Table7Desc = RECORD (Table)
+	 data : ARRAY t7cap OF I.Obj
+      END;
+      Table8 = POINTER TO Table8Desc;
+      Table8Desc = RECORD (Table)
+	 data : ARRAY t8cap OF I.Obj
+      END;
+      Table9 = POINTER TO Table9Desc;
+      Table9Desc = RECORD (Table)
+	 data : ARRAY t9cap OF I.Obj
+      END;
+      Table10 = POINTER TO Table10Desc;
+      Table10Desc = RECORD (Table)
+	 data : ARRAY t10cap OF I.Obj
+      END;
+      Table11 = POINTER TO Table11Desc;
+      Table11Desc = RECORD (Table)
+	 data : ARRAY t11cap OF I.Obj
+      END;
+      Table12 = POINTER TO Table12Desc;
+      Table12Desc = RECORD (Table)
+	 data : ARRAY t12cap OF I.Obj
+      END;
+      
+      Dict* = POINTER TO DictDesc;
+      DictDesc* = RECORD
+	 table : Table;
+	 keyclass : KeyComparerTC
+      END;
+
+      Visitor* = PROCEDURE(k : I.Obj; state : I.Obj) : BOOLEAN;
+
+      Tomb = POINTER TO TombDesc;
+      TombDesc = RECORD (I.ObjDesc) END;
+	 
+
+   VAR tomb : Tomb;
+
+
+   (* hack around O7's lack of dynamic open arrays *)
+
+
+   PROCEDURE uppercap(n : INTEGER) : INTEGER;
+   BEGIN
+      RETURN n + ASR(n, 1)
+   END uppercap;
+
+      
+   (* table1 *)
+
+   PROCEDURE get1(t : Table; i : INTEGER) : I.Obj;
+   BEGIN
+      RETURN t(Table1).data[i]
+   END get1;
+   
+   PROCEDURE set1(t : Table; i : INTEGER; v : I.Obj);
+   BEGIN
+      t(Table1).data[i] := v;
+   END set1;
+   
+   PROCEDURE mk1() : Table;
+      VAR t : Table1;
+   BEGIN
+      NEW(t); t.cap := LEN(t.data); t.get := get1; t.set := set1; 
+      RETURN t
+   END mk1;
+
+
+
+   (* table2 *)
+
+   PROCEDURE get2(t : Table; i : INTEGER) : I.Obj;
+   BEGIN
+      RETURN t(Table2).data[i]
+   END get2;
+   
+   PROCEDURE set2(t : Table; i : INTEGER; v : I.Obj);
+   BEGIN
+      t(Table2).data[i] := v;
+   END set2;
+   
+   PROCEDURE mk2() : Table;
+      VAR t : Table2;
+   BEGIN
+      NEW(t); t.cap := LEN(t.data); t.get := get2; t.set := set2; 
+      RETURN t
+   END mk2;
+
+   
+   (* table3 *)
+
+   PROCEDURE get3(t : Table; i : INTEGER) : I.Obj;
+   BEGIN
+      RETURN t(Table3).data[i]
+   END get3;
+   
+   PROCEDURE set3(t : Table; i : INTEGER; v : I.Obj);
+   BEGIN
+      t(Table3).data[i] := v;
+   END set3;
+   
+   PROCEDURE mk3() : Table;
+      VAR t : Table3;
+   BEGIN
+      NEW(t); t.cap := LEN(t.data); t.get := get3; t.set := set3; 
+      RETURN t
+   END mk3;
+
+   
+   (* table4 *)
+
+   PROCEDURE get4(t : Table; i : INTEGER) : I.Obj;
+   BEGIN
+      RETURN t(Table4).data[i]
+   END get4;
+   
+   PROCEDURE set4(t : Table; i : INTEGER; v : I.Obj);
+   BEGIN
+      t(Table4).data[i] := v;
+   END set4;
+   
+   PROCEDURE mk4() : Table;
+      VAR t : Table4;
+   BEGIN
+      NEW(t); t.cap := LEN(t.data); t.get := get4; t.set := set4; 
+      RETURN t
+   END mk4;
+
+   
+   (* table5 *)
+
+   PROCEDURE get5(t : Table; i : INTEGER) : I.Obj;
+   BEGIN
+      RETURN t(Table5).data[i]
+   END get5;
+   
+   PROCEDURE set5(t : Table; i : INTEGER; v : I.Obj);
+   BEGIN
+      t(Table5).data[i] := v;
+   END set5;
+   
+   PROCEDURE mk5() : Table;
+      VAR t : Table5;
+   BEGIN
+      NEW(t); t.cap := LEN(t.data); t.get := get5; t.set := set5; 
+      RETURN t
+   END mk5;
+
+
+   (* table6 *)
+
+   PROCEDURE get6(t : Table; i : INTEGER) : I.Obj;
+   BEGIN
+      RETURN t(Table6).data[i]
+   END get6;
+   
+   PROCEDURE set6(t : Table; i : INTEGER; v : I.Obj);
+   BEGIN
+      t(Table6).data[i] := v;
+   END set6;
+   
+   PROCEDURE mk6() : Table;
+      VAR t : Table6;
+   BEGIN
+      NEW(t); t.cap := LEN(t.data); t.get := get6; t.set := set6; 
+      RETURN t
+   END mk6;
+
+   
+   (* table7 *)
+
+   PROCEDURE get7(t : Table; i : INTEGER) : I.Obj;
+   BEGIN
+      RETURN t(Table7).data[i]
+   END get7;
+   
+   PROCEDURE set7(t : Table; i : INTEGER; v : I.Obj);
+   BEGIN
+      t(Table7).data[i] := v;
+   END set7;
+   
+   PROCEDURE mk7() : Table;
+      VAR t : Table7;
+   BEGIN
+      NEW(t); t.cap := LEN(t.data); t.get := get7; t.set := set7; 
+      RETURN t
+   END mk7;
+
+
+   (* table8 *)
+
+   PROCEDURE get8(t : Table; i : INTEGER) : I.Obj;
+   BEGIN
+      RETURN t(Table8).data[i]
+   END get8;
+   
+   PROCEDURE set8(t : Table; i : INTEGER; v : I.Obj);
+   BEGIN
+      t(Table8).data[i] := v;
+   END set8;
+   
+   PROCEDURE mk8() : Table;
+      VAR t : Table8;
+   BEGIN
+      NEW(t); t.cap := LEN(t.data); t.get := get8; t.set := set8; 
+      RETURN t
+   END mk8;
+
+
+   (* table9 *)
+
+   PROCEDURE get9(t : Table; i : INTEGER) : I.Obj;
+   BEGIN
+      RETURN t(Table9).data[i]
+   END get9;
+   
+   PROCEDURE set9(t : Table; i : INTEGER; v : I.Obj);
+   BEGIN
+      t(Table9).data[i] := v;
+   END set9;
+   
+   PROCEDURE mk9() : Table;
+      VAR t : Table9;
+   BEGIN
+      NEW(t); t.cap := LEN(t.data); t.get := get9; t.set := set9; 
+      RETURN t
+   END mk9;
+
+
+   (* table10 *)
+
+   PROCEDURE get10(t : Table; i : INTEGER) : I.Obj;
+   BEGIN
+      RETURN t(Table10).data[i]
+   END get10;
+   
+   PROCEDURE set10(t : Table; i : INTEGER; v : I.Obj);
+   BEGIN
+      t(Table10).data[i] := v;
+   END set10;
+   
+   PROCEDURE mk10() : Table;
+      VAR t : Table10;
+   BEGIN
+      NEW(t); t.cap := LEN(t.data); t.get := get10; t.set := set10; 
+      RETURN t
+   END mk10;
+
+
+   (* table11 *)
+
+   PROCEDURE get11(t : Table; i : INTEGER) : I.Obj;
+   BEGIN
+      RETURN t(Table11).data[i]
+   END get11;
+   
+   PROCEDURE set11(t : Table; i : INTEGER; v : I.Obj);
+   BEGIN
+      t(Table11).data[i] := v;
+   END set11;
+   
+   PROCEDURE mk11() : Table;
+      VAR t : Table11;
+   BEGIN
+      NEW(t); t.cap := LEN(t.data); t.get := get11; t.set := set11; 
+      RETURN t
+   END mk11;
+
+
+   (* table12 *)
+
+   PROCEDURE get12(t : Table; i : INTEGER) : I.Obj;
+   BEGIN
+      RETURN t(Table12).data[i]
+   END get12;
+   
+   PROCEDURE set12(t : Table; i : INTEGER; v : I.Obj);
+   BEGIN
+      t(Table12).data[i] := v;
+   END set12;
+   
+   PROCEDURE mk12() : Table;
+      VAR t : Table12;
+   BEGIN
+      NEW(t); t.cap := LEN(t.data); t.get := get12; t.set := set12; 
+      RETURN t
+   END mk12;
+
+
+   PROCEDURE MkTable(size : INTEGER) : Table;
+      VAR t : Table;
+   BEGIN
+      IF size <= t1cap THEN
+	 t := mk1();
+      ELSIF size <= t2cap THEN
+	 t := mk2();
+      ELSIF size <= t3cap THEN
+	 t := mk3();
+      ELSIF size <= t4cap THEN
+	 t := mk4();
+      ELSIF size <= t5cap THEN
+	 t := mk5();
+      ELSIF size <= t6cap THEN
+	 t := mk6();
+      ELSIF size <= t7cap THEN
+	 t := mk7();
+      ELSIF size <= t8cap THEN
+	 t := mk8();
+      ELSIF size <= t9cap THEN
+	 t := mk9();
+      ELSIF size <= t10cap THEN
+	 t := mk10();
+      ELSIF size <= t11cap THEN
+	 t := mk11();
+      ELSE
+	 t := mk12();
+      END;
+      RETURN t
+   END MkTable;
+
+
+
+   (* hash table implementation *)
+   
+
+   PROCEDURE insert(kc : KeyComparerTC; t : Table; kv : I.Obj) : BOOLEAN;
+      VAR i, h : INTEGER;
+	 misses : INTEGER;
+	 probe : I.Obj;
+	 inserted : BOOLEAN;
+   BEGIN
+      h := kc.Hash(kc, kv);
+      i := h MOD t.cap;
+      misses := 0;
+      probe := t.get(t, i);
+      WHILE (probe # NIL) & (probe # tomb) & ~kc.Eql(kc, probe, kv) DO
+	 i := (i + 1) MOD t.cap;
+	 probe := t.get(t, i);
+	 INC(misses);
+      END;
+      IF (probe = NIL) OR (probe = tomb) THEN
+	 inserted := TRUE;
+      ELSE
+	 inserted := FALSE;
+      END;
+      t.set(t, i, kv);
+      RETURN inserted
+   END insert;
+
+
+   PROCEDURE rehash(kc : KeyComparerTC; dst, src : Table);
+      VAR i, n : INTEGER;
+	 kv : I.Obj;
+	 inserted : BOOLEAN;
+   BEGIN
+      n := src.cap;
+      FOR i := 0 TO n-1 DO
+	 kv := src.get(src,i);
+	 IF (kv # NIL) & (kv # tomb) THEN
+	    inserted := insert(kc, dst, kv);
+	 END;
+      END;
+      dst.count := src.count;
+   END rehash;
+
+
+   PROCEDURE growIfNecessary(kc : KeyComparerTC; t : Table) : Table;
+      VAR targetcap : INTEGER;
+	 dst : Table;
+   BEGIN
+      targetcap := uppercap(t.count);
+      IF targetcap <= t.cap THEN
+	 dst := t;
+      ELSE
+	 dst := MkTable(targetcap);
+	 rehash(kc, dst, t);
+      END;
+      RETURN dst
+   END growIfNecessary;
+
+
+   PROCEDURE Insert*(VAR dict : DictDesc; kv : I.Obj);
+      VAR inserted : BOOLEAN;
+   BEGIN
+      dict.table := growIfNecessary(dict.keyclass, dict.table);
+      inserted := insert(dict.keyclass, dict.table, kv);
+      IF inserted THEN
+	 INC(dict.table.count);
+      END;
+   END Insert;
+
+
+   PROCEDURE find(kc : KeyComparerTC; VAR t : Table; k : I.Obj) : INTEGER;
+      VAR i, h : INTEGER;
+	 probe : I.Obj;
+   BEGIN
+      h := kc.Hash(kc, k);
+      i := h MOD t.cap;
+      probe := t.get(t, i);
+      WHILE (probe = tomb) OR ((probe # NIL) & ~kc.Eql(kc, probe, k)) DO
+	 i := (i + 1) MOD t.cap;
+	 probe := t.get(t, i);
+      END;
+      RETURN i
+   END find;
+   
+
+   PROCEDURE shrinkIfNecessary(kc : KeyComparerTC; t : Table) : Table;
+      VAR targetcap : INTEGER;
+	 dst : Table;
+   BEGIN
+      targetcap := uppercap(t.count);
+      targetcap := targetcap + ASR(targetcap,1);
+      IF targetcap >= ASR(t.cap, 4) THEN
+	 dst := t;
+      ELSE
+	 dst := MkTable(targetcap);
+	 rehash(kc, dst, t);
+      END;
+      RETURN dst
+   END shrinkIfNecessary;
+
+
+   PROCEDURE DeleteKey*(VAR dict : DictDesc; k : I.Obj);
+      VAR i : INTEGER;
+	 probe : I.Obj;
+   BEGIN
+      i := find(dict.keyclass, dict.table, k);
+      probe := dict.table.get(dict.table, i);
+      IF (probe # NIL) & dict.keyclass.Eql(dict.keyclass, probe, k) THEN
+	 dict.table.set(dict.table, i, tomb);
+	 DEC(dict.table.count);
+      END;
+      dict.table := shrinkIfNecessary(dict.keyclass, dict.table);
+   END DeleteKey;
+
+
+   PROCEDURE ContainsKey*(VAR dict : DictDesc; k : I.Obj) : BOOLEAN;
+      VAR i : INTEGER;
+	 probe : I.Obj;
+	 exists : BOOLEAN;
+   BEGIN
+      i := find(dict.keyclass, dict.table, k);
+      probe := dict.table.get(dict.table, i);
+      IF (probe # NIL) & dict.keyclass.Eql(dict.keyclass, probe, k) THEN
+	 exists := TRUE;
+      ELSE
+	 exists := FALSE;
+      END;
+      RETURN exists
+   END ContainsKey;
+
+
+   PROCEDURE Get*(VAR dict : DictDesc; k : I.Obj) : I.Obj;
+      VAR i : INTEGER;
+   BEGIN
+      i := find(dict.keyclass, dict.table, k);
+      RETURN dict.table.get(dict.table, i)
+   END Get;
+
+
+   PROCEDURE Count*(VAR dict : DictDesc) : INTEGER;
+   BEGIN
+      RETURN dict.table.count
+   END Count;
+
+
+   PROCEDURE Visit*(VAR dict : DictDesc; visit : Visitor; state: I.Obj);
+      VAR i : INTEGER;
+	 probe : I.Obj;
+	 t : Table;
+	 continue : BOOLEAN;
+   BEGIN
+      continue := TRUE;
+      t := dict.table;
+      i := 0;
+      WHILE (i < t.cap) & continue DO
+	 probe := t.get(t, i);
+	 IF (probe # NIL) & (probe # tomb) THEN
+	    continue := visit(probe, state);
+	 END;
+	 INC(i);
+      END;
+   END Visit;
+
+
+   PROCEDURE Init*(VAR dict : DictDesc; comparer : KeyComparerTCDesc);
+   BEGIN
+      dict.table := mk1();
+      NEW(dict.keyclass); dict.keyclass^ := comparer;
+   END Init;
+
+
+   PROCEDURE InitCap*(VAR dict : DictDesc; comparer : KeyComparerTCDesc; count: INTEGER);
+   BEGIN
+      dict.table := MkTable(uppercap(count));
+      NEW(dict.keyclass); dict.keyclass^ := comparer;
+   END InitCap;
+
+
+   PROCEDURE New*(kc : KeyComparerTCDesc) : Dict;
+      VAR dict : Dict;
+   BEGIN
+      NEW(dict);
+      Init(dict^, kc);
+      RETURN dict
+   END New;
+
+
+   PROCEDURE NewCap*(count : INTEGER; kc : KeyComparerTCDesc) : Dict;
+      VAR dict : Dict;
+   BEGIN
+      NEW(dict);
+      InitCap(dict^, kc, count);
+      RETURN dict
+   END NewCap;
+
+
+BEGIN
+   NEW(tomb);
+END Dictionary.

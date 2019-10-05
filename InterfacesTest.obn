@@ -1,0 +1,120 @@
+MODULE InterfacesTest;
+   IMPORT
+      Out,
+      I := Interfaces;
+
+   TYPE
+      Foo = RECORD (I.ObjectDesc)
+	 a : INTEGER;
+	 b : INTEGER
+      END;
+      Bar = RECORD (I.ObjectDesc)
+	 x : INTEGER;
+	 y : INTEGER
+      END;
+      TestClass = RECORD (I.ClassDesc)
+	 less : PROCEDURE(VAR p, q : I.ObjectDesc) : BOOLEAN;
+	 eql : PROCEDURE(VAR p, q : I.ObjectDesc) : BOOLEAN;
+	 print : PROCEDURE(VAR p : I.ObjectDesc)
+      END;
+
+
+   VAR
+      foo1, foo2 : Foo;
+      bar1, bar2 : Bar;
+      foo_class, bar_class : TestClass;
+
+
+   PROCEDURE Foo_Less(VAR pobj, qobj : I.ObjectDesc) : BOOLEAN;
+      VAR p, q : Foo;
+   BEGIN
+      p := pobj(Foo);
+      q := qobj(Foo);
+      RETURN (p.a < q.a) OR ((p.a = q.a) & (p.b < q.b))
+   END Foo_Less;
+
+   PROCEDURE Foo_Eql(VAR pobj, qobj : I.ObjectDesc) : BOOLEAN;
+      VAR p, q : Foo;
+   BEGIN
+      p := pobj(Foo);
+      q := qobj(Foo);
+      RETURN (p.a = q.a) & (p.b = q.b)
+   END Foo_Eql;
+
+   PROCEDURE Foo_Print(VAR pobj : I.ObjectDesc);
+      VAR p : Foo;
+   BEGIN
+      p := pobj(Foo);
+      Out.String("Foo(a = ");
+      Out.Int(p.a, 0);
+      Out.String(", b = ");
+      Out.Int(p.b, 0);
+      Out.String(")");
+      Out.Ln;
+   END Foo_Print;
+
+
+
+   PROCEDURE Bar_Less(VAR pobj, qobj : I.ObjectDesc) : BOOLEAN;
+      VAR p, q : Bar;
+   BEGIN
+      p := pobj(Bar);
+      q := qobj(Bar);
+      RETURN (p.x < q.x) OR ((p.x = q.x) & (p.y < q.y))
+   END Bar_Less;
+
+   PROCEDURE Bar_Eql(VAR pobj, qobj : I.ObjectDesc) : BOOLEAN;
+      VAR p, q : Bar;
+   BEGIN
+      p := pobj(Bar);
+      q := qobj(Bar);
+      RETURN (p.x = q.x) & (p.y = q.y)
+   END Bar_Eql;
+
+   PROCEDURE Bar_Print(VAR pobj : I.ObjectDesc);
+      VAR p : Bar;
+   BEGIN
+      p := pobj(Bar);
+      Out.String("Bar(x = ");
+      Out.Int(p.x, 0);
+      Out.String(", y = ");
+      Out.Int(p.y, 0);
+      Out.String(")");
+      Out.Ln;
+   END Bar_Print;
+
+
+
+   PROCEDURE Test(cls : TestClass; VAR a, b : I.ObjectDesc);
+   BEGIN
+      IF cls.eql(a, b) THEN
+	 Out.String("equals");
+	 Out.Ln;
+      END;
+      IF cls.less(a, b) THEN
+	 Out.String("less");
+	 Out.Ln;
+      END;
+      cls.print(a);
+      cls.print(b);
+   END Test;
+
+
+BEGIN
+   Out.Open;
+
+   foo_class.less := Foo_Less; foo_class.eql := Foo_Eql; foo_class.print := Foo_Print;
+   bar_class.less := Bar_Less; bar_class.eql := Bar_Eql; bar_class.print := Bar_Print;
+
+   foo1.a := 1; foo1.b := 2;
+   foo2.a := 1; foo2.b := 2;
+   bar1.x := 4; bar1.y := 5;
+   bar2.x := 4; bar2.y := 6;
+
+   Out.String("Testing class Foo"); Out.Ln;
+   Test(foo_class, foo1, foo2);
+
+   Out.String("Testing class Bar"); Out.Ln;
+   Test(bar_class, bar1, bar2);
+
+END InterfacesTest.
