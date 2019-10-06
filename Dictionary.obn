@@ -1,20 +1,23 @@
 
 MODULE Dictionary;
-   IMPORT I := Interfaces;
+
+   IMPORT SYSTEM, I := Interfaces;
 
    CONST
-      t1cap =  000000100H;
-      t2cap =  000000400H;
-      t3cap =  000001000H;
-      t4cap =  000004000H;
-      t5cap =  000010000H;
-      t6cap =  000040000H;
-      t7cap =  000100000H;
-      t8cap =  000400000H;
-      t9cap =  001000000H;
-      t10cap = 004000000H;
-      t11cap = 010000000H;
-      t12cap = 040000000H;
+      t1cap =         103;
+      t2cap =         413;
+      t3cap =        1655;
+      t4cap =        6625;
+      t5cap =       26507;
+      t6cap =      106039;
+      t7cap =      424169;
+      t8cap =     1696693;
+      t9cap =     6786791;
+      t10cap =   27147187;
+      t11cap =  108588777;
+      t12cap =  434355139;
+      t13cap = 1737420593;
+
 
    TYPE
       KeyComparerTC* = POINTER TO KeyComparerTCDesc;
@@ -78,6 +81,10 @@ MODULE Dictionary;
       Table12Desc = RECORD (Table)
 	 data : ARRAY t12cap OF I.Obj
       END;
+      Table13 = POINTER TO Table13Desc;
+      Table13Desc = RECORD (Table)
+	 data : ARRAY t13cap OF I.Obj
+      END;
       
       Dict* = POINTER TO DictDesc;
       DictDesc* = RECORD
@@ -92,7 +99,8 @@ MODULE Dictionary;
 	 
 
    VAR tomb : Tomb;
-
+      ibits : INTEGER;
+      ibits_2 : INTEGER;
 
    (* hack around O7's lack of dynamic open arrays *)
 
@@ -344,6 +352,27 @@ MODULE Dictionary;
    END mk12;
 
 
+   (* table13 *)
+
+   PROCEDURE get13(t : Table; i : INTEGER) : I.Obj;
+   BEGIN
+      RETURN t(Table13).data[i]
+   END get13;
+   
+   PROCEDURE set13(t : Table; i : INTEGER; v : I.Obj);
+   BEGIN
+      t(Table13).data[i] := v;
+   END set13;
+   
+   PROCEDURE mk13() : Table;
+      VAR t : Table13;
+   BEGIN
+      NEW(t); t.cap := LEN(t.data); t.get := get13; t.set := set13; 
+      RETURN t
+   END mk13;
+
+
+   (* create the smallest table type that will hold at least the requested # of elements *)
    PROCEDURE MkTable(size : INTEGER) : Table;
       VAR t : Table;
    BEGIN
@@ -369,8 +398,10 @@ MODULE Dictionary;
 	 t := mk10();
       ELSIF size <= t11cap THEN
 	 t := mk11();
-      ELSE
+      ELSIF size <= t12cap THEN
 	 t := mk12();
+      ELSE
+	 t := mk13();
       END;
       RETURN t
    END MkTable;
@@ -379,6 +410,11 @@ MODULE Dictionary;
 
    (* hash table implementation *)
    
+   PROCEDURE mixhash(h : INTEGER) : INTEGER;
+   BEGIN
+      RETURN SYSTEM.VAL(INTEGER, SYSTEM.VAL(SET, ROR(h, ibits_2)) + SYSTEM.VAL(SET, h))
+   END mixhash;
+
 
    PROCEDURE insert(kc : KeyComparerTC; t : Table; kv : I.Obj) : BOOLEAN;
       VAR i, h : INTEGER;
@@ -386,7 +422,7 @@ MODULE Dictionary;
 	 probe : I.Obj;
 	 inserted : BOOLEAN;
    BEGIN
-      h := kc.Hash(kc, kv);
+      h := mixhash(kc.Hash(kc, kv));
       i := h MOD t.cap;
       misses := 0;
       probe := t.get(t, i);
@@ -451,7 +487,7 @@ MODULE Dictionary;
       VAR i, h : INTEGER;
 	 probe : I.Obj;
    BEGIN
-      h := kc.Hash(kc, k);
+      h := mixhash(kc.Hash(kc, k));
       i := h MOD t.cap;
       probe := t.get(t, i);
       WHILE (probe = tomb) OR ((probe # NIL) & ~kc.Eql(kc, probe, k)) DO
@@ -573,6 +609,20 @@ MODULE Dictionary;
    END NewCap;
 
 
+   PROCEDURE findibits() : INTEGER;
+      VAR i, n : INTEGER;
+   BEGIN
+      n := 0;
+      i := 1;
+      WHILE i # 0 DO
+	 i := LSL(i, 1);
+	 INC(n);
+      END;
+      RETURN n
+   END findibits;
+
 BEGIN
    NEW(tomb);
+   ibits := findibits();
+   ibits_2 := ASR(ibits, 1);
 END Dictionary.
