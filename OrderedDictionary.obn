@@ -12,7 +12,7 @@ MODULE OrderedDictionary;
 
       Node = POINTER TO NodeDesc;
       NodeDesc = RECORD
-	 key: I.Obj;
+	 key, val: I.Obj;
 	 priority, count : INTEGER;
 	 left, right : Node
       END;
@@ -23,7 +23,7 @@ MODULE OrderedDictionary;
 	 Rnd : R.Random;
 	 KeyClass : KeyComparerTC
       END;
-      Visitor* = PROCEDURE(k : I.Obj; state: I.Obj) : BOOLEAN;
+      Visitor* = PROCEDURE(k, v, state : I.Obj) : BOOLEAN;
       
 
       
@@ -147,7 +147,7 @@ MODULE OrderedDictionary;
       IF t # NIL THEN
 	 continue := recursiveVisit(t.left, visit, state);
 	 IF continue THEN
-	    continue := visit(t.key, state);
+	    continue := visit(t.key, t.val, state);
 	 END;
 	 IF continue THEN
 	    continue := recursiveVisit(t.right, visit, state);
@@ -176,42 +176,42 @@ MODULE OrderedDictionary;
       RETURN dict
    END New;
 
-   PROCEDURE Insert*(VAR dict : DictDesc; k : I.Obj);
+   PROCEDURE Insert*(VAR dict : DictDesc; key, val : I.Obj);
       VAR
 	 it : Node;
    BEGIN
       NEW(it);
-      it.key := k; it.priority := R.Next(dict.Rnd); it.count := 1;
+      it.key := key; it.val := val; it.priority := R.Next(dict.Rnd); it.count := 1;
       it.left := NIL; it.right := NIL;
       insertNode(dict.KeyClass, dict.Root, it);
    END Insert;
 
-   PROCEDURE DeleteKey*(VAR dict : DictDesc; k : I.Obj);
+   PROCEDURE DeleteKey*(VAR dict : DictDesc; key : I.Obj);
    BEGIN
-      erase(dict.KeyClass, dict.Root, k);
+      erase(dict.KeyClass, dict.Root, key);
    END DeleteKey;
 
-   PROCEDURE ContainsKey*(VAR dict : DictDesc; k : I.Obj) : BOOLEAN;
+   PROCEDURE ContainsKey*(VAR dict : DictDesc; key : I.Obj) : BOOLEAN;
       VAR exists : BOOLEAN;
 	 node : Node;
    BEGIN
       exists := FALSE;
-      node := locateNode(dict.KeyClass, dict.Root, k);
+      node := locateNode(dict.KeyClass, dict.Root, key);
       IF node # NIL THEN
 	 exists := TRUE;
       END;
       RETURN exists
    END ContainsKey;
 
-   PROCEDURE Get*(VAR dict : DictDesc; k : I.Obj) : I.Obj;
+   PROCEDURE Get*(VAR dict : DictDesc; key : I.Obj) : I.Obj;
       VAR
 	 retn : I.Obj;
 	 node : Node;
    BEGIN
       retn := NIL;
-      node := locateNode(dict.KeyClass, dict.Root, k);
+      node := locateNode(dict.KeyClass, dict.Root, key);
       IF node # NIL THEN
-	 retn := node.key;
+	 retn := node.val;
       END;
       RETURN retn
    END Get;

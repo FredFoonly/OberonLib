@@ -30,60 +30,74 @@ MODULE Dictionary;
       TableDesc = RECORD
 	 count : INTEGER;
 	 cap : INTEGER;
-	 get : PROCEDURE(t : Table; i : INTEGER) : I.Obj;
-	 set : PROCEDURE(t : Table; i : INTEGER; v : I.Obj)
+	 getkey : PROCEDURE(t : Table; i : INTEGER) : I.Obj;
+	 getval : PROCEDURE(t : Table; i : INTEGER) : I.Obj;
+	 set : PROCEDURE(t : Table; i : INTEGER; k, v : I.Obj)
       END;
       Table1 = POINTER TO Table1Desc;
       Table1Desc = RECORD (Table)
-	 data : ARRAY t1cap OF I.Obj
+	 keys : ARRAY t1cap OF I.Obj;
+	 vals : ARRAY t1cap OF I.Obj
       END;
       Table2 = POINTER TO Table2Desc;
       Table2Desc = RECORD (Table)
-	 data : ARRAY t2cap OF I.Obj
+	 keys : ARRAY t2cap OF I.Obj;
+	 vals : ARRAY t2cap OF I.Obj
       END;
       Table3 = POINTER TO Table3Desc;
       Table3Desc = RECORD (Table)
-	 data : ARRAY t3cap OF I.Obj
+	 keys : ARRAY t3cap OF I.Obj;
+	 vals : ARRAY t3cap OF I.Obj
       END;
       Table4 = POINTER TO Table4Desc;
       Table4Desc = RECORD (Table)
-	 data : ARRAY t4cap OF I.Obj
+	 keys : ARRAY t4cap OF I.Obj;
+	 vals : ARRAY t4cap OF I.Obj
       END;
       Table5 = POINTER TO Table5Desc;
       Table5Desc = RECORD (Table)
-	 data : ARRAY t5cap OF I.Obj
+	 keys : ARRAY t5cap OF I.Obj;
+	 vals : ARRAY t5cap OF I.Obj
       END;
       Table6 = POINTER TO Table6Desc;
       Table6Desc = RECORD (Table)
-	 data : ARRAY t6cap OF I.Obj
+	 keys : ARRAY t6cap OF I.Obj;
+	 vals : ARRAY t6cap OF I.Obj
       END;
       Table7 = POINTER TO Table7Desc;
       Table7Desc = RECORD (Table)
-	 data : ARRAY t7cap OF I.Obj
+	 keys : ARRAY t7cap OF I.Obj;
+	 vals : ARRAY t7cap OF I.Obj
       END;
       Table8 = POINTER TO Table8Desc;
       Table8Desc = RECORD (Table)
-	 data : ARRAY t8cap OF I.Obj
+	 keys : ARRAY t8cap OF I.Obj;
+	 vals : ARRAY t8cap OF I.Obj
       END;
       Table9 = POINTER TO Table9Desc;
       Table9Desc = RECORD (Table)
-	 data : ARRAY t9cap OF I.Obj
+	 keys : ARRAY t9cap OF I.Obj;
+	 vals : ARRAY t9cap OF I.Obj
       END;
       Table10 = POINTER TO Table10Desc;
       Table10Desc = RECORD (Table)
-	 data : ARRAY t10cap OF I.Obj
+	 keys : ARRAY t10cap OF I.Obj;
+	 vals : ARRAY t10cap OF I.Obj
       END;
       Table11 = POINTER TO Table11Desc;
       Table11Desc = RECORD (Table)
-	 data : ARRAY t11cap OF I.Obj
+	 keys : ARRAY t11cap OF I.Obj;
+	 vals : ARRAY t11cap OF I.Obj
       END;
       Table12 = POINTER TO Table12Desc;
       Table12Desc = RECORD (Table)
-	 data : ARRAY t12cap OF I.Obj
+	 keys : ARRAY t12cap OF I.Obj;
+	 vals : ARRAY t12cap OF I.Obj
       END;
       Table13 = POINTER TO Table13Desc;
       Table13Desc = RECORD (Table)
-	 data : ARRAY t13cap OF I.Obj
+	 keys : ARRAY t13cap OF I.Obj;
+	 vals : ARRAY t13cap OF I.Obj
       END;
       
       Dict* = POINTER TO DictDesc;
@@ -92,7 +106,7 @@ MODULE Dictionary;
 	 keyclass : KeyComparerTC
       END;
 
-      Visitor* = PROCEDURE(k : I.Obj; state : I.Obj) : BOOLEAN;
+      Visitor* = PROCEDURE(k, v : I.Obj; state : I.Obj) : BOOLEAN;
 
       Tomb = POINTER TO TombDesc;
       TombDesc = RECORD (I.ObjDesc) END;
@@ -102,8 +116,6 @@ MODULE Dictionary;
       ibits : INTEGER;
       ibits_2 : INTEGER;
 
-   (* hack around O7's lack of dynamic open arrays *)
-
 
    PROCEDURE uppercap(n : INTEGER) : INTEGER;
    BEGIN
@@ -111,263 +123,357 @@ MODULE Dictionary;
    END uppercap;
 
       
-   (* table1 *)
 
-   PROCEDURE get1(t : Table; i : INTEGER) : I.Obj;
+   (* hack around O7's lack of dynamic open arrays *)
+
+
+   (* table size class 1 *)
+   PROCEDURE getkey1(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      RETURN t(Table1).data[i]
-   END get1;
+      RETURN t(Table1).keys[i]
+   END getkey1;
    
-   PROCEDURE set1(t : Table; i : INTEGER; v : I.Obj);
+   PROCEDURE getval1(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      t(Table1).data[i] := v;
+      RETURN t(Table1).vals[i]
+   END getval1;
+   
+   PROCEDURE set1(t : Table; i : INTEGER; k, v : I.Obj);
+      VAR t1 : Table1;
+   BEGIN
+      t1 := t(Table1);
+      t1.keys[i] := k;
+      t1.vals[i] := v;
    END set1;
    
    PROCEDURE mk1() : Table;
       VAR t : Table1;
    BEGIN
-      NEW(t); t.cap := LEN(t.data); t.get := get1; t.set := set1; 
+      NEW(t); t.cap := LEN(t.keys); t.getkey := getkey1; t.getval := getval1; t.set := set1; 
       RETURN t
    END mk1;
 
 
-
-   (* table2 *)
-
-   PROCEDURE get2(t : Table; i : INTEGER) : I.Obj;
+   (* table size class 2 *)
+   PROCEDURE getkey2(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      RETURN t(Table2).data[i]
-   END get2;
+      RETURN t(Table2).keys[i]
+   END getkey2;
    
-   PROCEDURE set2(t : Table; i : INTEGER; v : I.Obj);
+   PROCEDURE getval2(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      t(Table2).data[i] := v;
+      RETURN t(Table2).vals[i]
+   END getval2;
+   
+   PROCEDURE set2(t : Table; i : INTEGER; k, v : I.Obj);
+      VAR t2 : Table2;
+   BEGIN
+      t2 := t(Table2);
+      t2.keys[i] := k;
+      t2.vals[i] := v;
    END set2;
    
    PROCEDURE mk2() : Table;
       VAR t : Table2;
    BEGIN
-      NEW(t); t.cap := LEN(t.data); t.get := get2; t.set := set2; 
+      NEW(t); t.cap := LEN(t.keys); t.getkey := getkey2; t.getval := getval2; t.set := set2; 
       RETURN t
    END mk2;
 
    
-   (* table3 *)
-
-   PROCEDURE get3(t : Table; i : INTEGER) : I.Obj;
+   (* table size class 3 *)
+   PROCEDURE getkey3(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      RETURN t(Table3).data[i]
-   END get3;
+      RETURN t(Table3).keys[i]
+   END getkey3;
    
-   PROCEDURE set3(t : Table; i : INTEGER; v : I.Obj);
+   PROCEDURE getval3(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      t(Table3).data[i] := v;
+      RETURN t(Table3).vals[i]
+   END getval3;
+   
+   PROCEDURE set3(t : Table; i : INTEGER; k, v : I.Obj);
+      VAR t3 : Table3;
+   BEGIN
+      t3 := t(Table3);
+      t3.keys[i] := k;
+      t3.vals[i] := v;
    END set3;
    
    PROCEDURE mk3() : Table;
       VAR t : Table3;
    BEGIN
-      NEW(t); t.cap := LEN(t.data); t.get := get3; t.set := set3; 
+      NEW(t); t.cap := LEN(t.keys); t.getkey := getkey3; t.getval := getval3; t.set := set3; 
       RETURN t
    END mk3;
 
    
-   (* table4 *)
-
-   PROCEDURE get4(t : Table; i : INTEGER) : I.Obj;
+   (* table size class 4 *)
+   PROCEDURE getkey4(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      RETURN t(Table4).data[i]
-   END get4;
+      RETURN t(Table4).keys[i]
+   END getkey4;
    
-   PROCEDURE set4(t : Table; i : INTEGER; v : I.Obj);
+   PROCEDURE getval4(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      t(Table4).data[i] := v;
+      RETURN t(Table4).vals[i]
+   END getval4;
+   
+   PROCEDURE set4(t : Table; i : INTEGER; k, v : I.Obj);
+      VAR t4 : Table4;
+   BEGIN
+      t4 := t(Table4);
+      t4.keys[i] := k;
+      t4.vals[i] := v;
    END set4;
    
    PROCEDURE mk4() : Table;
       VAR t : Table4;
    BEGIN
-      NEW(t); t.cap := LEN(t.data); t.get := get4; t.set := set4; 
+      NEW(t); t.cap := LEN(t.keys); t.getkey := getkey4; t.getval := getval4; t.set := set4; 
       RETURN t
    END mk4;
 
    
-   (* table5 *)
-
-   PROCEDURE get5(t : Table; i : INTEGER) : I.Obj;
+   (* table size class 5 *)
+   PROCEDURE getkey5(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      RETURN t(Table5).data[i]
-   END get5;
+      RETURN t(Table5).keys[i]
+   END getkey5;
    
-   PROCEDURE set5(t : Table; i : INTEGER; v : I.Obj);
+   PROCEDURE getval5(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      t(Table5).data[i] := v;
+      RETURN t(Table5).vals[i]
+   END getval5;
+   
+   PROCEDURE set5(t : Table; i : INTEGER; k, v : I.Obj);
+      VAR t5 : Table5;
+   BEGIN
+      t5 := t(Table5);
+      t5.keys[i] := k;
+      t5.vals[i] := v;
    END set5;
    
    PROCEDURE mk5() : Table;
       VAR t : Table5;
    BEGIN
-      NEW(t); t.cap := LEN(t.data); t.get := get5; t.set := set5; 
+      NEW(t); t.cap := LEN(t.keys); t.getkey := getkey5; t.getval := getval5; t.set := set5; 
       RETURN t
    END mk5;
 
 
-   (* table6 *)
-
-   PROCEDURE get6(t : Table; i : INTEGER) : I.Obj;
+   (* table size class 6 *)
+   PROCEDURE getkey6(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      RETURN t(Table6).data[i]
-   END get6;
+      RETURN t(Table6).keys[i]
+   END getkey6;
    
-   PROCEDURE set6(t : Table; i : INTEGER; v : I.Obj);
+   PROCEDURE getval6(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      t(Table6).data[i] := v;
+      RETURN t(Table6).vals[i]
+   END getval6;
+   
+   PROCEDURE set6(t : Table; i : INTEGER; k ,v : I.Obj);
+      VAR t6 : Table6;
+   BEGIN
+      t6 := t(Table6);
+      t6.keys[i] := k;
+      t6.vals[i] := v;
    END set6;
    
    PROCEDURE mk6() : Table;
       VAR t : Table6;
    BEGIN
-      NEW(t); t.cap := LEN(t.data); t.get := get6; t.set := set6; 
+      NEW(t); t.cap := LEN(t.keys); t.getkey := getkey6; t.getval := getval6; t.set := set6; 
       RETURN t
    END mk6;
 
    
-   (* table7 *)
-
-   PROCEDURE get7(t : Table; i : INTEGER) : I.Obj;
+   (* table size class 7 *)
+   PROCEDURE getkey7(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      RETURN t(Table7).data[i]
-   END get7;
+      RETURN t(Table7).keys[i]
+   END getkey7;
    
-   PROCEDURE set7(t : Table; i : INTEGER; v : I.Obj);
+   PROCEDURE getval7(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      t(Table7).data[i] := v;
+      RETURN t(Table7).vals[i]
+   END getval7;
+   
+   PROCEDURE set7(t : Table; i : INTEGER; k, v : I.Obj);
+      VAR t7 : Table7;
+   BEGIN
+      t7 := t(Table7);
+      t7.keys[i] := k;
+      t7.vals[i] := v;
    END set7;
    
    PROCEDURE mk7() : Table;
       VAR t : Table7;
    BEGIN
-      NEW(t); t.cap := LEN(t.data); t.get := get7; t.set := set7; 
+      NEW(t); t.cap := LEN(t.keys); t.getkey := getkey7; t.getval := getval7; t.set := set7; 
       RETURN t
    END mk7;
 
 
-   (* table8 *)
-
-   PROCEDURE get8(t : Table; i : INTEGER) : I.Obj;
+   (* table size class 8 *)
+   PROCEDURE getkey8(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      RETURN t(Table8).data[i]
-   END get8;
+      RETURN t(Table8).keys[i]
+   END getkey8;
    
-   PROCEDURE set8(t : Table; i : INTEGER; v : I.Obj);
+   PROCEDURE getval8(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      t(Table8).data[i] := v;
+      RETURN t(Table8).vals[i]
+   END getval8;
+   
+   PROCEDURE set8(t : Table; i : INTEGER; k, v : I.Obj);
+      VAR t8 : Table8;
+   BEGIN
+      t8 := t(Table8);
+      t8.keys[i] := k;
+      t8.vals[i] := v;
    END set8;
    
    PROCEDURE mk8() : Table;
       VAR t : Table8;
    BEGIN
-      NEW(t); t.cap := LEN(t.data); t.get := get8; t.set := set8; 
+      NEW(t); t.cap := LEN(t.keys); t.getkey := getkey8; t.getval := getval8; t.set := set8; 
       RETURN t
    END mk8;
 
 
-   (* table9 *)
-
-   PROCEDURE get9(t : Table; i : INTEGER) : I.Obj;
+   (* table size class 9 *)
+   PROCEDURE getkey9(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      RETURN t(Table9).data[i]
-   END get9;
+      RETURN t(Table9).keys[i]
+   END getkey9;
    
-   PROCEDURE set9(t : Table; i : INTEGER; v : I.Obj);
+   PROCEDURE getval9(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      t(Table9).data[i] := v;
+      RETURN t(Table9).vals[i]
+   END getval9;
+   
+   PROCEDURE set9(t : Table; i : INTEGER; k, v : I.Obj);
+      VAR t9 : Table9;
+   BEGIN
+      t9 := t(Table9);
+      t9.keys[i] := k;
+      t9.vals[i] := v;
    END set9;
    
    PROCEDURE mk9() : Table;
       VAR t : Table9;
    BEGIN
-      NEW(t); t.cap := LEN(t.data); t.get := get9; t.set := set9; 
+      NEW(t); t.cap := LEN(t.keys); t.getkey := getkey9; t.getval := getval9; t.set := set9; 
       RETURN t
    END mk9;
 
 
-   (* table10 *)
-
-   PROCEDURE get10(t : Table; i : INTEGER) : I.Obj;
+   (* table size class 10 *)
+   PROCEDURE getkey10(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      RETURN t(Table10).data[i]
-   END get10;
+      RETURN t(Table10).keys[i]
+   END getkey10;
    
-   PROCEDURE set10(t : Table; i : INTEGER; v : I.Obj);
+   PROCEDURE getval10(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      t(Table10).data[i] := v;
+      RETURN t(Table10).vals[i]
+   END getval10;
+   
+   PROCEDURE set10(t : Table; i : INTEGER; k, v : I.Obj);
+      VAR t10 : Table10;
+   BEGIN
+      t10 := t(Table10);
+      t10.keys[i] := k;
+      t10.vals[i] := v;
    END set10;
    
    PROCEDURE mk10() : Table;
       VAR t : Table10;
    BEGIN
-      NEW(t); t.cap := LEN(t.data); t.get := get10; t.set := set10; 
+      NEW(t); t.cap := LEN(t.keys); t.getkey := getkey10; t.getval := getval10; t.set := set10; 
       RETURN t
    END mk10;
 
 
-   (* table11 *)
-
-   PROCEDURE get11(t : Table; i : INTEGER) : I.Obj;
+   (* table size class 11 *)
+   PROCEDURE getkey11(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      RETURN t(Table11).data[i]
-   END get11;
+      RETURN t(Table11).keys[i]
+   END getkey11;
    
-   PROCEDURE set11(t : Table; i : INTEGER; v : I.Obj);
+   PROCEDURE getval11(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      t(Table11).data[i] := v;
+      RETURN t(Table11).vals[i]
+   END getval11;
+   
+   PROCEDURE set11(t : Table; i : INTEGER; k, v : I.Obj);
+      VAR t11 : Table11;
+   BEGIN
+      t11 := t(Table11);
+      t11.keys[i] := k;
+      t11.vals[i] := v;
    END set11;
    
    PROCEDURE mk11() : Table;
       VAR t : Table11;
    BEGIN
-      NEW(t); t.cap := LEN(t.data); t.get := get11; t.set := set11; 
+      NEW(t); t.cap := LEN(t.keys); t.getkey := getkey11; t.getval := getval11; t.set := set11; 
       RETURN t
    END mk11;
 
 
-   (* table12 *)
-
-   PROCEDURE get12(t : Table; i : INTEGER) : I.Obj;
+   (* table size class 12 *)
+   PROCEDURE getkey12(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      RETURN t(Table12).data[i]
-   END get12;
+      RETURN t(Table12).keys[i]
+   END getkey12;
    
-   PROCEDURE set12(t : Table; i : INTEGER; v : I.Obj);
+   PROCEDURE getval12(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      t(Table12).data[i] := v;
+      RETURN t(Table12).vals[i]
+   END getval12;
+   
+   PROCEDURE set12(t : Table; i : INTEGER; k, v : I.Obj);
+      VAR t12 : Table12;
+   BEGIN
+      t12 := t(Table12);
+      t12.keys[i] := k;
+      t12.vals[i] := v;
    END set12;
    
    PROCEDURE mk12() : Table;
       VAR t : Table12;
    BEGIN
-      NEW(t); t.cap := LEN(t.data); t.get := get12; t.set := set12; 
+      NEW(t); t.cap := LEN(t.keys); t.getkey := getkey12; t.getval := getval12; t.set := set12; 
       RETURN t
    END mk12;
 
 
-   (* table13 *)
-
-   PROCEDURE get13(t : Table; i : INTEGER) : I.Obj;
+   (* table size class 13 *)
+   PROCEDURE getkey13(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      RETURN t(Table13).data[i]
-   END get13;
+      RETURN t(Table13).keys[i]
+   END getkey13;
    
-   PROCEDURE set13(t : Table; i : INTEGER; v : I.Obj);
+   PROCEDURE getval13(t : Table; i : INTEGER) : I.Obj;
    BEGIN
-      t(Table13).data[i] := v;
+      RETURN t(Table13).vals[i]
+   END getval13;
+   
+   PROCEDURE set13(t : Table; i : INTEGER; k, v : I.Obj);
+      VAR t13 : Table13;
+   BEGIN
+      t13 := t(Table13);
+      t13.keys[i] := k;
+      t13.vals[i] := v;
    END set13;
    
    PROCEDURE mk13() : Table;
       VAR t : Table13;
    BEGIN
-      NEW(t); t.cap := LEN(t.data); t.get := get13; t.set := set13; 
+      NEW(t); t.cap := LEN(t.keys); t.getkey := getkey13; t.getval := getval13; t.set := set13; 
       RETURN t
    END mk13;
 
@@ -416,19 +522,19 @@ MODULE Dictionary;
    END mixhash;
 
 
-   PROCEDURE insert(kc : KeyComparerTC; t : Table; kv : I.Obj) : BOOLEAN;
+   PROCEDURE insert(kc : KeyComparerTC; t : Table; key, val : I.Obj) : BOOLEAN;
       VAR i, h : INTEGER;
 	 misses : INTEGER;
 	 probe : I.Obj;
 	 inserted : BOOLEAN;
    BEGIN
-      h := mixhash(kc.Hash(kc, kv));
+      h := mixhash(kc.Hash(kc, key));
       i := h MOD t.cap;
       misses := 0;
-      probe := t.get(t, i);
-      WHILE (probe # NIL) & (probe # tomb) & ~kc.Eql(kc, probe, kv) DO
+      probe := t.getkey(t, i);
+      WHILE (probe # NIL) & (probe # tomb) & ~kc.Eql(kc, probe, key) DO
 	 i := (i + 1) MOD t.cap;
-	 probe := t.get(t, i);
+	 probe := t.getkey(t, i);
 	 INC(misses);
       END;
       IF (probe = NIL) OR (probe = tomb) THEN
@@ -436,21 +542,22 @@ MODULE Dictionary;
       ELSE
 	 inserted := FALSE;
       END;
-      t.set(t, i, kv);
+      t.set(t, i, key, val);
       RETURN inserted
    END insert;
 
 
    PROCEDURE rehash(kc : KeyComparerTC; dst, src : Table);
       VAR i, n : INTEGER;
-	 kv : I.Obj;
+	 k, v : I.Obj;
 	 inserted : BOOLEAN;
    BEGIN
       n := src.cap;
       FOR i := 0 TO n-1 DO
-	 kv := src.get(src,i);
-	 IF (kv # NIL) & (kv # tomb) THEN
-	    inserted := insert(kc, dst, kv);
+	 k := src.getkey(src,i);
+	 IF (k # NIL) & (k # tomb) THEN
+	    v := src.getval(src,i);
+	    inserted := insert(kc, dst, k, v);
 	 END;
       END;
       dst.count := src.count;
@@ -472,11 +579,11 @@ MODULE Dictionary;
    END growIfNecessary;
 
 
-   PROCEDURE Insert*(VAR dict : DictDesc; kv : I.Obj);
+   PROCEDURE Insert*(VAR dict : DictDesc; k, v : I.Obj);
       VAR inserted : BOOLEAN;
    BEGIN
       dict.table := growIfNecessary(dict.keyclass, dict.table);
-      inserted := insert(dict.keyclass, dict.table, kv);
+      inserted := insert(dict.keyclass, dict.table, k, v);
       IF inserted THEN
 	 INC(dict.table.count);
       END;
@@ -489,10 +596,10 @@ MODULE Dictionary;
    BEGIN
       h := mixhash(kc.Hash(kc, k));
       i := h MOD t.cap;
-      probe := t.get(t, i);
+      probe := t.getkey(t, i);
       WHILE (probe = tomb) OR ((probe # NIL) & ~kc.Eql(kc, probe, k)) DO
 	 i := (i + 1) MOD t.cap;
-	 probe := t.get(t, i);
+	 probe := t.getkey(t, i);
       END;
       RETURN i
    END find;
@@ -519,9 +626,9 @@ MODULE Dictionary;
 	 probe : I.Obj;
    BEGIN
       i := find(dict.keyclass, dict.table, k);
-      probe := dict.table.get(dict.table, i);
-      IF (probe # NIL) & dict.keyclass.Eql(dict.keyclass, probe, k) THEN
-	 dict.table.set(dict.table, i, tomb);
+      probe := dict.table.getkey(dict.table, i);
+      IF (probe # NIL) THEN
+	 dict.table.set(dict.table, i, tomb, NIL);
 	 DEC(dict.table.count);
       END;
       dict.table := shrinkIfNecessary(dict.keyclass, dict.table);
@@ -534,8 +641,8 @@ MODULE Dictionary;
 	 exists : BOOLEAN;
    BEGIN
       i := find(dict.keyclass, dict.table, k);
-      probe := dict.table.get(dict.table, i);
-      IF (probe # NIL) & dict.keyclass.Eql(dict.keyclass, probe, k) THEN
+      probe := dict.table.getkey(dict.table, i);
+      IF (probe # NIL) THEN
 	 exists := TRUE;
       ELSE
 	 exists := FALSE;
@@ -548,7 +655,7 @@ MODULE Dictionary;
       VAR i : INTEGER;
    BEGIN
       i := find(dict.keyclass, dict.table, k);
-      RETURN dict.table.get(dict.table, i)
+      RETURN dict.table.getval(dict.table, i)
    END Get;
 
 
@@ -560,7 +667,7 @@ MODULE Dictionary;
 
    PROCEDURE Visit*(VAR dict : DictDesc; visit : Visitor; state: I.Obj);
       VAR i : INTEGER;
-	 probe : I.Obj;
+	 k, v : I.Obj;
 	 t : Table;
 	 continue : BOOLEAN;
    BEGIN
@@ -568,9 +675,10 @@ MODULE Dictionary;
       t := dict.table;
       i := 0;
       WHILE (i < t.cap) & continue DO
-	 probe := t.get(t, i);
-	 IF (probe # NIL) & (probe # tomb) THEN
-	    continue := visit(probe, state);
+	 k := t.getkey(t, i);
+	 IF (k # NIL) & (k # tomb) THEN
+	    v := t.getval(t, i);
+	    continue := visit(k, v, state);
 	 END;
 	 INC(i);
       END;

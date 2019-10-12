@@ -13,9 +13,12 @@ MODULE DictionaryTest;
 
    TYPE
       keystr = ARRAY maxkeyn OF CHAR;
-      KV = POINTER TO KVDesc;
-      KVDesc = RECORD (I.ObjDesc)
-	 k : keystr;
+      IntKey = POINTER TO IntKeyDesc;
+      IntKeyDesc = RECORD (I.ObjDesc)
+	 k : keystr
+      END;
+      IntVal = POINTER TO IntValDesc;
+      IntValDesc = RECORD (I.ObjDesc)
 	 v : INTEGER
       END;
 
@@ -29,22 +32,23 @@ MODULE DictionaryTest;
       d : T.DictDesc;
       compareNodes : T.KeyComparerTCDesc;
       i : INTEGER;
-      k : KV;
+      k : IntKey;
+      v : IntVal;
       keys : ARRAY maxn OF keystr;
       printstate : keyprinterstate;
 
 
    PROCEDURE Eql(kc : T.KeyComparerTC; a, b : I.Obj) : BOOLEAN;
    BEGIN
-      RETURN a(KV).k = b(KV).k
+      RETURN a(IntKey).k = b(IntKey).k
    END Eql;
 
 
    PROCEDURE Hash(kc : T.KeyComparerTC; oa : I.Obj) : INTEGER;
       VAR i, h : INTEGER;
-	 a : KV;
+	 a : IntKey;
    BEGIN
-      a := oa(KV);
+      a := oa(IntKey);
       i := 0;
       h := 0DEADBEEFH;
       WHILE (i < LEN(a.k)) & (a.k[i] # 0X) DO
@@ -69,14 +73,14 @@ MODULE DictionaryTest;
    END MkRandKey;
 
 
-   PROCEDURE keyprinter(oa : I.Obj; os : I.Obj) : BOOLEAN;
-      VAR a : KV;
+   PROCEDURE keyprinter(ok, ov : I.Obj; os : I.Obj) : BOOLEAN;
+      VAR k : IntKey;
 	 s : keyprinterstate;
    BEGIN
-      a := oa(KV);
+      k := ok(IntKey);
       s := os(keyprinterstate);
       IF s.ct >= s.first THEN 
-	 Out.Int(s.ct, 3); Out.String(": '"); Out.String(a.k); Out.String("' "); Out.Ln;
+	 Out.Int(s.ct, 3); Out.String(": '"); Out.String(k.k); Out.String("' "); Out.Ln;
       END;
       INC(s.ct);
       RETURN s.ct < s.last
@@ -97,15 +101,14 @@ BEGIN
 
    Out.String("Inserting keys"); Out.Ln;
    FOR i := 0 TO maxn-1 DO
-      NEW(k);
-      k.k := keys[i];
-      k.v := i;
+      NEW(k); k.k := keys[i];
+      NEW(v); v.v := i;
       (*
       IF (i MOD 1000) = 0 THEN
 	 Out.Int(i, 0); Out.Ln;
       END;
       *)
-      T.Insert(d, k);
+      T.Insert(d, k, v);
    END;
 
    Out.String("Checking keys, ct = "); Out.Int(T.Count(d), 0); Out.Ln;

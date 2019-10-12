@@ -8,34 +8,41 @@ MODULE OrderedDictionaryTest;
       maxn = 100;
 
    TYPE
-      KV = POINTER TO KVDesc;
-      KVDesc = RECORD (I.ObjDesc)
-	 k : INTEGER;
+      IntKey = POINTER TO IntKeyDesc;
+      IntKeyDesc = RECORD (I.ObjDesc)
+	 k : INTEGER
+      END;
+
+      IntVal = POINTER TO IntValDesc;
+      IntValDesc = RECORD (I.ObjDesc)
 	 v : INTEGER
       END;
 
    VAR
       d : T.DictDesc;
       compareNodes : T.KeyComparerTCDesc;
-      i, j : INTEGER;
-      k : KV;
+      i : INTEGER;
+      k : IntKey;
+      v : IntVal;
 
 
    PROCEDURE Less(kc : T.KeyComparerTC; a, b : I.Obj) : BOOLEAN;
    BEGIN
-      RETURN a(KV).k < b(KV).k
+      RETURN a(IntKey).k < b(IntKey).k
    END Less;
 
 
-   PROCEDURE keyprinter(oa : I.Obj; state : I.Obj) : BOOLEAN;
-      VAR a : KV;
+   PROCEDURE printer(ok, ov : I.Obj; state : I.Obj) : BOOLEAN;
+      VAR k : IntKey;
+	 v : IntVal;
    BEGIN
-      a := oa(KV);
-      IF (a.k >= 10) & (a.k <= 20) THEN 
-	 Out.Int(a.k, 0); Out.String(" ");
+      k := ok(IntKey);
+      v := ov(IntVal);
+      IF (k.k >= 10) & (k.k <= 20) THEN 
+	 Out.Int(k.k, 0); Out.String(" ");
       END;
-      RETURN a.k < 20
-   END keyprinter;
+      RETURN k.k < 20
+   END printer;
 
 BEGIN
    compareNodes.Less := Less;
@@ -43,8 +50,9 @@ BEGIN
 
    Out.String("Inserting keys"); Out.Ln;
    FOR i := 1 TO maxn DO
-      NEW(k); k.k := i; k.v := -i;
-      T.Insert(d, k);
+      NEW(k); k.k := i;
+      NEW(v); v.v := -i;
+      T.Insert(d, k, v);
    END;
 
    Out.String("Checking keys, ct = "); Out.Int(T.Count(d), 0); Out.Ln;
@@ -80,7 +88,7 @@ BEGIN
 
 
    Out.String("Printing keys from 10 to 20"); Out.Ln;
-   T.Visit(d, keyprinter, NIL);
+   T.Visit(d, printer, NIL);
 
    Out.String("Done"); Out.Ln;
 END OrderedDictionaryTest.
